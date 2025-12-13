@@ -23,7 +23,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({
+        const processedData = data.map((dt: any) => ({
           activityID: dt.activityID,
           catalog: dt.catalog,
           startTime: dt.startTime,
@@ -32,11 +32,11 @@ export async function RouteDonki(app: FastifyInstance) {
           link: dt.link,
           note: dt.note,
           submissionTime: dt.submissionTime,
-          instruments: dt.instruments.map((e) => ({
+          instruments: dt.instruments.map((e: any) => ({
             displayName: e.displayName,
           })),
           linkedEvents: dt.linkedEvents,
-          cmeAnalyses: dt.cmeAnalyses.map((e) => ({
+          cmeAnalyses: dt.cmeAnalyses.map((e: any) => ({
             enlilList: e.enlilList,
             levelOfData: e.levelOfData,
 
@@ -95,7 +95,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -129,12 +129,12 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({
+        const processedData = data.map((dt: any) => ({
           gstId: dt.gstId,   // Identificador do GST
           startTime: dt.startTime, // Hora de início do GST
           link: dt.link, // Link para mais informações
 
-          allKpIndex: dt.allKpIndex.map((e) => ({   // Mapeando os índices Kp
+          allKpIndex: dt.allKpIndex.map((e: any) => ({   // Mapeando os índices Kp
             observedTime: e.observedTime, // Hora observada
             kpIndex: e.kpIndex, // Índice Kp
             source: e.source, // Fonte do índice Kp
@@ -173,7 +173,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -207,7 +207,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -241,7 +241,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -275,7 +275,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -309,7 +309,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -343,7 +343,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -377,7 +377,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
@@ -411,7 +411,7 @@ export async function RouteDonki(app: FastifyInstance) {
         const data = response.data
 
         // tratamento dos dados
-        const processedData = data.map((dt) => ({}))
+        const processedData = data.map((dt: any) => ({}))
 
         // Enviando os dados tratados para o front-end
         reply.send(data)
