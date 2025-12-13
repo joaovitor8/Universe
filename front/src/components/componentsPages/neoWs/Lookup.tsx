@@ -34,7 +34,7 @@ export const Lookup = () => {
   const [selectedApproachDate, setSelectedApproachDate] = useState<string>('')
 
   const apiOff = "http://127.0.0.1:4000"
-  const apiOn = "https://api-universe-back.vercel.app"
+  const apiOn = "https://api-universe.onrender.com"
 
 
   const GetAsteroidsLookup = useCallback(async () => {

@@ -20,7 +20,7 @@ export const Feed = () => {
   const [error, setError] = useState<string | null>(null)
 
   const apiOff = "http://127.0.0.1:4000"
-  const apiOn = "https://api-universe-back.vercel.app"
+  const apiOn = "https://api-universe.onrender.com"
 
 
   const GetFeed = useCallback(() => {
