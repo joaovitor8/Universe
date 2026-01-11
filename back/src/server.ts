@@ -19,7 +19,7 @@ const fastify = Fastify({ logger: true })
 
 // Configuração do Banco de Dados (Segura para Build)
 // Garante que o arquivo fique na raiz do projeto ou numa pasta existente
-const dbPath = path.resolve(__dirname, 'newsUsers.db'); 
+const dbPath = path.resolve("./src/DB/", 'newsUsers.db'); 
 const db = new sqlite3.Database(dbPath)
 
 fastify.register(cors, {
