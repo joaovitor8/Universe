@@ -2,19 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { 
-  CheckCircle2, 
-  Cpu, 
-  FlaskConical, 
-  Loader2, 
-  MapPin, 
-  Microscope, 
-  Milestone, 
-  Rocket, 
-  Settings, 
-  Wrench 
-} from "lucide-react";
+import { Cpu, FlaskConical, MapPin, Milestone, Rocket, Settings, Wrench } from "lucide-react";
 import axios from "axios";
+
 
 // Tipagem baseada na documentação do TechPort
 type Project = {
@@ -32,10 +22,12 @@ type Project = {
   currentTrl?: number;
 };
 
+
 const fetchProjects = async (): Promise<Project[]> => {
   const res = await axios.get<Project[]>("/api/techport");
   return res.data;
 };
+
 
 // Componente visual para a Escala TRL (1 a 9)
 const TrlBar = ({ current }: { current?: number }) => {
@@ -50,7 +42,7 @@ const TrlBar = ({ current }: { current?: number }) => {
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((block) => (
           <div 
             key={block}
-            className={`h-2 flex-grow transition-all duration-500 ${
+            className={`h-2 grow transition-all duration-500 ${
               block <= level 
                 ? 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]' 
                 : 'bg-cyan-950/40 border border-cyan-900/30'
@@ -91,7 +83,7 @@ export default function TechPortPage() {
            }}
       />
       
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none -z-10" />
+      <div className="absolute top-0 left-0 w-full h-96 bg-linear-to-b from-cyan-900/10 to-transparent pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto">
         
@@ -217,7 +209,7 @@ export default function TechPortPage() {
                   </div>
 
                   {/* Descrição (Abstract) */}
-                  <div className="flex-grow mb-8 relative">
+                  <div className="grow mb-8 relative">
                     <div className="absolute left-0 top-0 w-1 h-full bg-cyan-900/30" />
                     <p className="text-sm text-slate-400 leading-relaxed pl-4 font-light text-justify line-clamp-4">
                       {stripHtml(project.description)}

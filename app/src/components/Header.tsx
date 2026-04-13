@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Orbit, Menu, X,Camera,Database,Globe2,Telescope } from "lucide-react";
 
+
 // Categorizamos as APIs para o Mega Menu ficar organizado
 const apiCategories = [
   {
@@ -14,7 +15,7 @@ const apiCategories = [
     links: [
       { name: "A Imagem do Dia (APOD)", href: "/apod" },
       { name: "Biblioteca Central da NASA", href: "/library" },
-      { name: "Câmeras de Marte", href: "/mars" },
+      // { name: "Câmeras de Marte", href: "/mars" },
       { name: "Time-lapse Terrestre (EPIC)", href: "/epic" },
     ]
   },
@@ -24,8 +25,8 @@ const apiCategories = [
     links: [
       { name: "Defesa Planetária (CNEOS)", href: "/cneos" },
       { name: "Rastreio NEO (Asteroides)", href: "/asteroids" },
-      { name: "Clima Solar (DONKI)", href: "/donki" },
-      { name: "Anomalias Terrestres (EONET)", href: "/eonet" },
+      // { name: "Clima Solar (DONKI)", href: "/donki" },
+      // { name: "Anomalias Terrestres (EONET)", href: "/eonet" },
     ]
   },
   {
@@ -33,8 +34,8 @@ const apiCategories = [
     icon: Telescope,
     links: [
       { name: "Tráfego Orbital (SSC)", href: "/ssc" },
-      { name: "Lentes GIBS", href: "/gibs" },
-      { name: "Cartografia (WMTS Trek)", href: "/trek" },
+      // { name: "Lentes GIBS", href: "/gibs" },
+      // { name: "Cartografia (WMTS Trek)", href: "/trek" },
       { name: "Cálculo Orbital (TLE)", href: "/tle" },
     ]
   },
@@ -43,9 +44,9 @@ const apiCategories = [
     icon: Database,
     links: [
       { name: "Arquivo Exoplanetário", href: "/exoplanets" },
-      { name: "Laboratório Orbital (OSDR)", href: "/osdr" },
-      { name: "Blueprints P&D (TechPort)", href: "/techport" },
-      { name: "Licenciamento (TechTransfer)", href: "/techtransfer" },
+      // { name: "Laboratório Orbital (OSDR)", href: "/osdr" },
+      // { name: "Blueprints P&D (TechPort)", href: "/techport" },
+      // { name: "Licenciamento (TechTransfer)", href: "/techtransfer" },
     ]
   }
 ];

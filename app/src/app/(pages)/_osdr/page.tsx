@@ -3,19 +3,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Dna, 
-  FlaskConical, 
-  Leaf, 
-  Loader2, 
-  Microscope, 
-  Rocket, 
-  Search, 
-  TestTube 
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Dna, FlaskConical, Leaf, Loader2, Microscope, Rocket, Search, TestTube } from "lucide-react";
 import axios from "axios";
+
 
 // Tipagem baseada no ElasticSearch do OSDR
 type OsdrStudy = {
@@ -30,10 +20,12 @@ type OsdrStudy = {
   };
 };
 
+
 const fetchBioData = async (query: string): Promise<OsdrStudy[]> => {
   const res = await axios.get<OsdrStudy[]>(`/api/osdr?q=${query}`);
   return res.data;
 };
+
 
 // Função para escolher o ícone baseado no organismo estudado
 const getOrganismIcon = (organism?: string) => {
@@ -49,6 +41,7 @@ const getOrganismIcon = (organism?: string) => {
   
   return <Dna className="w-5 h-5 text-teal-500" />;
 };
+
 
 export default function OsdrPage() {
   const [searchInput, setSearchInput] = useState("");
@@ -98,7 +91,7 @@ export default function OsdrPage() {
           <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
             Laboratório Orbital
           </h1>
-          <p className="text-teal-500/70 mb-8 text-lg flex items-center gap-2 font-mono uppercase tracking-widest text-sm">
+          <p className="text-teal-500/70 mb-8 flex items-center gap-2 font-mono uppercase tracking-widest text-sm">
             <Dna className="w-4 h-4" /> Open Science Data Repository (OSDR)
           </p>
 
@@ -169,7 +162,7 @@ export default function OsdrPage() {
                     onClick={() => toggleDossier(study._id)}
                     className="w-full text-left p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
                   >
-                    <div className="flex items-start gap-4 flex-grow pr-4">
+                    <div className="flex items-start gap-4 grow pr-4">
                       <div className={`p-3 rounded-xl mt-1 ${isExpanded ? 'bg-teal-900/30' : 'bg-teal-950/30'}`}>
                         {getOrganismIcon(source.Organism)}
                       </div>
@@ -190,7 +183,7 @@ export default function OsdrPage() {
                       </div>
                     </div>
                     
-                    <div className="flex-shrink-0 p-2 bg-teal-950/30 rounded-full text-teal-500 md:self-center self-end">
+                    <div className="shrink-0 p-2 bg-teal-950/30 rounded-full text-teal-500 md:self-center self-end">
                       {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                     </div>
                   </button>

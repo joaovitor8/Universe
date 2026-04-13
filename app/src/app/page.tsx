@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Image as ImageIcon, Telescope, Database,Library,ShieldAlert,Sun,ThermometerSun,Globe2,Layers,Camera,Radio,Terminal,Cpu,Briefcase,Dna,Map as MapIcon } from "lucide-react";
+import { ArrowRight, Sparkles, Image as ImageIcon, Telescope, Database, Library, ShieldAlert, Sun, ThermometerSun, Globe2, Layers, Camera, Radio, Terminal, Cpu, Briefcase, Dna, Map as MapIcon } from "lucide-react";
 import Link from "next/link";
+
 
 // Variantes de animação para o Framer Motion
 const containerVariants = {
@@ -15,8 +16,9 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 100 } },
 };
+
 
 // O Arsenal Completo das 16 APIs da NASA estruturado para um Bento Grid
 const apiCards = [
@@ -48,34 +50,34 @@ const apiCards = [
     href: "/cneos",
     colSpan: "md:col-span-1 lg:col-span-1",
   },
-  {
-    title: "Clima Espacial",
-    description: "Relatório tático de erupções e tempestades solares (DONKI).",
-    icon: Sun,
-    href: "/donki",
-    colSpan: "md:col-span-1 lg:col-span-1",
-  },
-  {
-    title: "Base InSight",
-    description: "Arquivo histórico da telemetria e clima na superfície de Marte.",
-    icon: ThermometerSun,
-    href: "/mars",
-    colSpan: "md:col-span-1 lg:col-span-1",
-  },
-  {
-    title: "Anomalias Terrestres",
-    description: "Observatório de eventos geológicos e climáticos severos em tempo real (EONET).",
-    icon: Globe2,
-    href: "/eonet",
-    colSpan: "md:col-span-2 lg:col-span-2",
-  },
-  {
-    title: "Lentes GIBS",
-    description: "Sobreposição global interativa de dados climáticos e atmosféricos.",
-    icon: Layers,
-    href: "/gibs",
-    colSpan: "md:col-span-1 lg:col-span-1",
-  },
+  // {
+  //   title: "Clima Espacial",
+  //   description: "Relatório tático de erupções e tempestades solares (DONKI).",
+  //   icon: Sun,
+  //   href: "/donki",
+  //   colSpan: "md:col-span-1 lg:col-span-1",
+  // },
+  // {
+  //   title: "Base InSight",
+  //   description: "Arquivo histórico da telemetria e clima na superfície de Marte.",
+  //   icon: ThermometerSun,
+  //   href: "/mars",
+  //   colSpan: "md:col-span-1 lg:col-span-1",
+  // },
+  // {
+  //   title: "Anomalias Terrestres",
+  //   description: "Observatório de eventos geológicos e climáticos severos em tempo real (EONET).",
+  //   icon: Globe2,
+  //   href: "/eonet",
+  //   colSpan: "md:col-span-2 lg:col-span-2",
+  // },
+  // {
+  //   title: "Lentes GIBS",
+  //   description: "Sobreposição global interativa de dados climáticos e atmosféricos.",
+  //   icon: Layers,
+  //   href: "/gibs",
+  //   colSpan: "md:col-span-1 lg:col-span-1",
+  // },
   {
     title: "Satélite DSCOVR",
     description: "Time-lapse da rotação da Terra vista do ponto Lagrange L1 (EPIC).",
@@ -104,35 +106,36 @@ const apiCards = [
     href: "/tle",
     colSpan: "md:col-span-2 lg:col-span-2",
   },
-  {
-    title: "Blueprints de P&D",
-    description: "Esquemas técnicos e níveis de maturidade de novas tecnologias da agência (TechPort).",
-    icon: Cpu,
-    href: "/techport",
-    colSpan: "md:col-span-2 lg:col-span-2",
-  },
-  {
-    title: "Licenciamento",
-    description: "Portal B2B de patentes, códigos-fonte abertos e spinoffs (TechTransfer).",
-    icon: Briefcase,
-    href: "/techtransfer",
-    colSpan: "md:col-span-1 lg:col-span-1",
-  },
-  {
-    title: "Lab. Orbital (OSDR)",
-    description: "Dossiês confidenciais de bioinformática e vida submetida à microgravidade.",
-    icon: Dna,
-    href: "/osdr",
-    colSpan: "md:col-span-1 lg:col-span-1",
-  },
-  {
-    title: "Cartografia Planetária (WMTS)",
-    description: "Motor Slippy Map para explorar livremente os vales e crateras da Lua, Marte e do asteroide Vesta em altíssima resolução.",
-    icon: MapIcon,
-    href: "/trek",
-    colSpan: "md:col-span-4 lg:col-span-4", // Ocupa a linha inteira no final
-  },
+  // {
+  //   title: "Blueprints de P&D",
+  //   description: "Esquemas técnicos e níveis de maturidade de novas tecnologias da agência (TechPort).",
+  //   icon: Cpu,
+  //   href: "/techport",
+  //   colSpan: "md:col-span-2 lg:col-span-2",
+  // },
+  // {
+  //   title: "Licenciamento",
+  //   description: "Portal B2B de patentes, códigos-fonte abertos e spinoffs (TechTransfer).",
+  //   icon: Briefcase,
+  //   href: "/techtransfer",
+  //   colSpan: "md:col-span-1 lg:col-span-1",
+  // },
+  // {
+  //   title: "Lab. Orbital (OSDR)",
+  //   description: "Dossiês confidenciais de bioinformática e vida submetida à microgravidade.",
+  //   icon: Dna,
+  //   href: "/osdr",
+  //   colSpan: "md:col-span-1 lg:col-span-1",
+  // },
+  // {
+  //   title: "Cartografia Planetária (WMTS)",
+  //   description: "Motor Slippy Map para explorar livremente os vales e crateras da Lua, Marte e do asteroide Vesta em altíssima resolução.",
+  //   icon: MapIcon,
+  //   href: "/trek",
+  //   colSpan: "md:col-span-4 lg:col-span-4", // Ocupa a linha inteira no final
+  // },
 ];
+
 
 export default function Home() {
   return (
@@ -172,7 +175,7 @@ export default function Home() {
           transition={{ duration: 0.7, delay: 0.4 }}
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          Navegue pelas 16 APIs abertas da NASA. Da poeira ancestral de Marte à luz de galáxias distantes, a história da exploração universal está codificada e ao seu alcance.
+          Navegue pelas APIs abertas da NASA. Da poeira ancestral de Marte à luz de galáxias distantes, a história da exploração universal está codificada e ao seu alcance.
         </motion.p>
 
         <motion.div 
@@ -196,7 +199,7 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">Selecione uma interface para calibrar a telemetria.</p>
           </div>
           <div className="bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-md">
-            <span className="text-sm text-primary font-mono font-bold tracking-widest uppercase">16 / 16 Ativos</span>
+            <span className="text-sm text-primary font-mono font-bold tracking-widest uppercase">8 / 16 Ativos</span>
           </div>
         </div>
 

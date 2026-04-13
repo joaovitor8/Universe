@@ -3,31 +3,26 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Briefcase, 
-  Code2, 
-  Cpu, 
-  ExternalLink, 
-  FileBadge, 
-  Lightbulb, 
-  Loader2, 
-  Search 
-} from "lucide-react";
+import { Briefcase, Code2, Cpu, ExternalLink, FileBadge, Lightbulb, Loader2, Search } from "lucide-react";
 import axios from "axios";
+
 
 // Definimos os tipos que nossa página vai aceitar
 type TechType = "patent" | "software" | "spinoff";
+
 
 const fetchTechTransfer = async (type: TechType, query: string): Promise<string[][]> => {
   const res = await axios.get<string[][]>(`/api/techtransfer?type=${type}&q=${query}`);
   return res.data;
 };
 
+
 // Remove as tags HTML residuais da descrição
 const stripHtml = (html: string) => {
   if (!html) return "";
   return html.replace(/<[^>]*>?/gm, '');
 };
+
 
 export default function TechTransferPage() {
   const [activeTab, setActiveTab] = useState<TechType>("software");
@@ -193,7 +188,7 @@ export default function TechTransferPage() {
                       {title}
                     </h2>
 
-                    <p className="text-sm text-slate-400 leading-relaxed line-clamp-4 flex-grow mb-6 text-justify">
+                    <p className="text-sm text-slate-400 leading-relaxed line-clamp-4 grow mb-6 text-justify">
                       {description || "Detalhes adicionais confidenciais ou não informados na base de dados."}
                     </p>
 

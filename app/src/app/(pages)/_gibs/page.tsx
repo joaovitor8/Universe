@@ -3,18 +3,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Cloud, 
-  Droplets, 
-  Globe, 
-  Layers, 
-  Loader2, 
-  Map, 
-  Search, 
-  ThermometerSun, 
-  Wind 
-} from "lucide-react";
+import { Cloud, Globe, Layers, Loader2, Map, Search, ThermometerSun, Wind } from "lucide-react";
 import axios from "axios";
+
 
 // Definição das Camadas (Lentes do Satélite)
 const GIB_LAYERS = [
@@ -48,21 +39,25 @@ const GIB_LAYERS = [
   }
 ];
 
+
 type GibsResponse = {
   imageUrl: string;
   date: string;
   layer: string;
 };
 
+
 const fetchGibsSnapshot = async (date: string, layer: string): Promise<GibsResponse> => {
   const res = await axios.get<GibsResponse>(`/api/gibs?date=${date}&layer=${layer}`);
   return res.data;
 };
 
+
 // Ontem é a data mais segura para garantir que o mapa global foi montado pela NASA
 const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 1);
 const defaultDate = yesterday.toISOString().split("T")[0];
+
 
 export default function GibsPage() {
   const [selectedDate, setSelectedDate] = useState(defaultDate);
@@ -78,11 +73,11 @@ export default function GibsPage() {
   return (
     <div className="relative h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full overflow-hidden flex flex-col md:flex-row">
       
-      {/* 1. MESA DE OPERAÇÃO: O Mapa (Fica no fundo da tela) */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 to-black">
+      {/* MESA DE OPERAÇÃO: O Mapa (Fica no fundo da tela) */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-slate-900 to-black">
         
         {/* Grade de coordenadas simulada no fundo */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[100px_100px] pointer-events-none" />
 
         {(isLoading || isFetching) && (
           <div className="absolute z-20 bg-black/60 backdrop-blur-sm inset-0 flex flex-col items-center justify-center gap-4 transition-opacity">
@@ -115,7 +110,7 @@ export default function GibsPage() {
         </AnimatePresence>
       </div>
 
-      {/* 2. PAINEL DE CONTROLE FLUTUANTE (HUD) */}
+      {/* PAINEL DE CONTROLE FLUTUANTE (HUD) */}
       <div className="relative z-10 w-full h-full flex flex-col justify-between p-4 md:p-6 pointer-events-none">
         
         {/* Topo: Título e Data */}

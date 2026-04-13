@@ -1,23 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ArrowDown, 
-  ArrowLeft, 
-  ArrowRight, 
-  ArrowUp, 
-  Compass, 
-  Crosshair, 
-  Globe, 
-  Layers, 
-  Loader2, 
-  Map as MapIcon, 
-  ZoomIn, 
-  ZoomOut 
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Compass, Crosshair, Globe, Layers, Loader2, Map as MapIcon, ZoomIn, ZoomOut } from "lucide-react";
 import axios from "axios";
+
 
 // Tipagem da nossa configuração
 type TrekConfig = {
@@ -28,10 +17,12 @@ type TrekConfig = {
   maxZoom: number;
 };
 
+
 const fetchTrekConfig = async (target: string): Promise<TrekConfig> => {
   const res = await axios.get<TrekConfig>(`/api/trek?target=${target}`);
   return res.data;
 };
+
 
 // Construtor do URL do Azulejo (Tile) da NASA
 const buildTileUrl = (config: TrekConfig, z: number, y: number, x: number) => {
@@ -42,6 +33,7 @@ const buildTileUrl = (config: TrekConfig, z: number, y: number, x: number) => {
   }
   return `https://trek.nasa.gov/tiles/${config.body}/EQ/${config.layer}/1.0.0//default/default028mm/${z}/${y}/${x}.${config.format}`;
 };
+
 
 export default function TrekPage() {
   const [target, setTarget] = useState<"moon" | "mars" | "vesta">("mars");
@@ -89,9 +81,9 @@ export default function TrekPage() {
     <div className="min-h-screen text-slate-300 pt-12 pb-24 px-4 sm:px-8 relative overflow-hidden">
       
       {/* Background Topográfico */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px] pointer-events-none -z-10" />
 
-      <div className="max-w-[1400px] mx-auto w-full flex-grow flex flex-col h-[calc(100vh-8rem)]">
+      <div className="max-w-350 mx-auto w-full grow flex flex-col h-[calc(100vh-8rem)]">
         
         {/* HEADER: Mesa de Luz */}
         <motion.div 
@@ -136,15 +128,15 @@ export default function TrekPage() {
         </motion.div>
 
         {/* ÁREA DE OPERAÇÃO (O Mapa + Controlos) */}
-        <div className="flex flex-col lg:flex-row gap-8 flex-grow min-h-0">
+        <div className="flex flex-col lg:flex-row gap-8 grow min-h-0">
           
           {/* MESA DE PROJEÇÃO (O Motor de Tiles Customizado) */}
           <div className="w-full lg:w-3/4 bg-[#050505] border border-slate-800 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]">
             
             {/* Mira Central (Crosshair) */}
             <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center opacity-30">
-              <div className="w-full h-[1px] bg-cyan-500 absolute" />
-              <div className="w-[1px] h-full bg-cyan-500 absolute" />
+              <div className="w-full h-px bg-cyan-500 absolute" />
+              <div className="w-px h-full bg-cyan-500 absolute" />
               <Crosshair className="w-12 h-12 text-cyan-400" />
             </div>
 
@@ -152,14 +144,14 @@ export default function TrekPage() {
             {isLoading || !config ? (
               <Loader2 className="w-12 h-12 text-slate-600 animate-spin" />
             ) : (
-              <div className="grid grid-cols-3 grid-rows-3 w-[768px] h-[768px] scale-[0.6] sm:scale-75 md:scale-100 transition-transform origin-center">
+              <div className="grid grid-cols-3 grid-rows-3 w-3X1 h-192 scale-[0.6] sm:scale-75 md:scale-100 transition-transform origin-center">
                 {gridOffsets.map(([dx, dy], index) => {
                   const tileX = x + dx;
                   const tileY = y + dy;
                   const url = buildTileUrl(config, z, tileY, tileX);
                   
                   return (
-                    <div key={`${target}-${z}-${tileX}-${tileY}-${index}`} className="w-[256px] h-[256px] border-[0.5px] border-slate-900/30 bg-slate-950 flex items-center justify-center relative group">
+                    <div key={`${target}-${z}-${tileX}-${tileY}-${index}`} className="w-[256px] h-64 border-[0.5px] border-slate-900/30 bg-slate-950 flex items-center justify-center relative group">
                       {/* Imagem do WMTS */}
                       <img 
                         src={url} 
@@ -212,7 +204,7 @@ export default function TrekPage() {
             </div>
 
             {/* Zoom e Telemetria */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 backdrop-blur-md flex flex-col gap-6 flex-grow">
+            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 backdrop-blur-md flex flex-col gap-6 grow">
               
               <div>
                 <span className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-3 block">Nível de Zoom (Z)</span>
@@ -241,7 +233,7 @@ export default function TrekPage() {
                 </div>
                 <div className="flex justify-between items-end">
                   <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Camada Ativa</span>
-                  <span className="text-xs font-mono text-slate-400 truncate max-w-[150px]" title={config?.layer}>
+                  <span className="text-xs font-mono text-slate-400 truncate max-w-37.5" title={config?.layer}>
                     {config?.layer}
                   </span>
                 </div>
