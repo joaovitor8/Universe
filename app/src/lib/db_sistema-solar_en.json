@@ -1,0 +1,574 @@
+{
+  "planets": [
+    {
+      "id": 0,
+      "name": "Sun",
+      "type": "Star",
+      "slug": "sun",
+      "presentation": "The heart of our solar system, a massive ball of plasma that sustains all life on Earth.",
+      "ui_theme": {
+        "primary_color": "#FDB813",
+        "secondary_color": "#FD8813"
+      },
+      "earth_comparison": {
+        "size": "109x Earth (diameter)",
+        "gravity": "28x Earth (intense)",
+        "day_length": "25-35 days (varies by latitude)"
+      },
+      "culture": {
+        "name_origin": "From ancient Germanic and Proto-Indo-European words meaning 'bright' or 'shining'.",
+        "astronomical_symbol": "☉"
+      },
+      "curiosities": [
+        "The Sun accounts for 99.86% of all mass in the solar system.",
+        "It converts 600 million tons of hydrogen into helium every second.",
+        "Solar flares and coronal mass ejections can disrupt satellites and power grids on Earth."
+      ],
+      "description": "The Sun is a G-type main-sequence star at the center of our solar system. It is by far the most massive object in the solar system, containing 99.86% of the system's mass. The Sun has been the primary source of energy for processes on Earth's surface, such as weather, ocean currents, and life.",
+      "geological_data": {
+        "composition": "Plasma composed of hydrogen (73.46%) and helium (24.85%), with trace amounts of heavier elements.",
+        "core": "Core temperature reaches 15 million Kelvin, where nuclear fusion occurs.",
+        "surface": "The photosphere is the visible surface layer at approximately 5,500 K."
+      },
+      "atmospheric_data": {
+        "summary": "Layered atmosphere extending millions of kilometers into space.",
+        "details": "The chromosphere lies above the photosphere, followed by the corona, which extends into the solar wind.",
+        "main_components": ["Hydrogen", "Helium", "Traces of Carbon", "Nitrogen", "Oxygen", "Iron"]
+      },
+      "natural_satellites": {
+        "has_satellites": false,
+        "count": 0,
+        "list": []
+      },
+      "space_missions": [
+        {
+          "name": "Parker Solar Probe",
+          "agency": "NASA",
+          "year": "2018-Present",
+          "feat": "Closest approach to the Sun, studying solar wind and corona."
+        },
+        {
+          "name": "Solar Dynamics Observatory (SDO)",
+          "agency": "NASA",
+          "year": "2010-Present",
+          "feat": "Observing the solar atmosphere and magnetic field variations."
+        },
+        {
+          "name": "SOHO",
+          "agency": "NASA/ESA",
+          "year": "1995-Present",
+          "feat": "Studying the Sun's corona and detecting comets."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 1391000,
+        "distance_from_sun_au": 0,
+        "distance_from_sun_km": 0,
+        "gravity_ms2": 273.95,
+        "avg_temperature_c": 5505,
+        "orbital_period": "N/A",
+        "rotation_period": "25-35 days"
+      }
+    },
+    {
+      "id": 1,
+      "name": "Mercury",
+      "type": "Terrestrial",
+      "slug": "mercury",
+      "presentation": "The swift messenger and the closest planet to the Sun.",
+      "ui_theme": {
+        "primary_color": "#9D9B99",
+        "secondary_color": "#4A4A4A"
+      },
+      "earth_comparison": {
+        "size": "0.38x Earth (slightly larger than the Moon)",
+        "gravity": "0.38x Earth (you would feel 62% lighter)",
+        "day_length": "58.6 Earth days"
+      },
+      "culture": {
+        "name_origin": "Named after the Roman messenger god, known for his speed.",
+        "astronomical_symbol": "☿"
+      },
+      "curiosities": [
+        "A year on Mercury is just 88 Earth days.",
+        "It has the most extreme temperature fluctuations in the solar system.",
+        "Despite being closest to the Sun, ice exists in its permanently shadowed craters."
+      ],
+      "description": "Mercury is the smallest planet in the Solar System. Despite its proximity to the Sun, it is not the hottest planet. It is a world of extremes, with drastic temperature variations between day and night. Its surface is marked by deep craters, resembling Earth's Moon.",
+      "geological_data": {
+        "composition": "Rocky and metallic. Extremely high density for its size.",
+        "core": "Huge metallic iron core, occupying about 85% of the planet's radius.",
+        "surface": "Riddled with impact craters and large scarps formed by the planet's cooling."
+      },
+      "atmospheric_data": {
+        "summary": "Virtually non-existent (Exosphere).",
+        "details": "Lacks a traditional atmosphere to retain heat. Possesses a thin 'exosphere' of atoms blasted from the surface by solar wind.",
+        "main_components": ["Oxygen", "Sodium", "Hydrogen", "Helium", "Potassium"]
+      },
+      "natural_satellites": {
+        "has_satellites": false,
+        "count": 0,
+        "list": []
+      },
+      "space_missions": [
+        {
+          "name": "Mariner 10",
+          "agency": "NASA",
+          "year": "1974-1975",
+          "feat": "First probe to visit Mercury, mapped 45% of the surface."
+        },
+        {
+          "name": "MESSENGER",
+          "agency": "NASA",
+          "year": "2004-2015",
+          "feat": "First to orbit the planet, mapped 100% of the surface."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 4879,
+        "distance_from_sun_au": 0.4,
+        "distance_from_sun_km": 57910000,
+        "gravity_ms2": 3.7,
+        "avg_temperature_c": 167,
+        "orbital_period": "88 Earth days",
+        "rotation_period": "59 Earth days"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Venus",
+      "type": "Terrestrial",
+      "slug": "venus",
+      "presentation": "Earth's infernal twin and the brightest object in the night sky after the Moon.",
+      "ui_theme": {
+        "primary_color": "#E3BB76",
+        "secondary_color": "#D48D26"
+      },
+      "earth_comparison": {
+        "size": "0.95x Earth (almost identical size)",
+        "gravity": "0.90x Earth (very similar to Earth)",
+        "day_length": "243 Earth days (longer than its year)"
+      },
+      "culture": {
+        "name_origin": "Named after the Roman goddess of love and beauty.",
+        "astronomical_symbol": "♀"
+      },
+      "curiosities": [
+        "It spins in the opposite direction (retrograde) to most planets.",
+        "A day on Venus is longer than a year on Venus.",
+        "It is the hottest planet in the solar system due to the greenhouse effect."
+      ],
+      "description": "Venus is often called Earth's twin due to similar size and mass, but its evolution took a drastically different path. It is shrouded in thick clouds creating a runaway greenhouse effect.",
+      "geological_data": {
+        "composition": "Rocky (silicates) with a metallic core.",
+        "core": "Likely similar to Earth's iron-nickel core but generates no magnetic field.",
+        "surface": "Geologically young, covered in volcanoes, lava plains, and deformed mountains."
+      },
+      "atmospheric_data": {
+        "summary": "Extremely dense and toxic.",
+        "details": "Surface pressure is 90 times that of Earth. Clouds of sulfuric acid cover the planet permanently.",
+        "main_components": ["Carbon Dioxide (96%)", "Nitrogen (3.5%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": false,
+        "count": 0,
+        "list": []
+      },
+      "space_missions": [
+        {
+          "name": "Venera Series",
+          "agency": "Soviet Union",
+          "year": "1961-1984",
+          "feat": "First soft landing on another planet and first photos of the surface."
+        },
+        {
+          "name": "Magellan",
+          "agency": "NASA",
+          "year": "1989-1994",
+          "feat": "Mapped 98% of Venus's surface using radar."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 12104,
+        "distance_from_sun_au": 0.7,
+        "distance_from_sun_km": 108200000,
+        "gravity_ms2": 8.87,
+        "avg_temperature_c": 465,
+        "orbital_period": "225 Earth days",
+        "rotation_period": "243 Earth days (retrograde)"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Earth",
+      "type": "Terrestrial",
+      "slug": "earth",
+      "presentation": "The Pale Blue Dot, our home and the only known world to harbor life.",
+      "ui_theme": {
+        "primary_color": "#2E8BC0",
+        "secondary_color": "#1B4F72"
+      },
+      "earth_comparison": {
+        "size": "1.00x Earth (The standard)",
+        "gravity": "1.00x Earth (9.8 m/s²)",
+        "day_length": "23h 56m"
+      },
+      "culture": {
+        "name_origin": "The name 'Earth' is at least 1,000 years old, derived from Germanic words meaning 'the ground'.",
+        "astronomical_symbol": "⊕"
+      },
+      "curiosities": [
+        "It is the only planet with liquid water on its surface.",
+        "It is the only planet not named after a Greek or Roman deity.",
+        "It has a powerful magnetic field that protects life from solar radiation."
+      ],
+      "description": "Earth is the largest of the rocky planets. Its nitrogen-oxygen atmosphere and protective magnetic field create ideal conditions for the biosphere. It is the only planet with active plate tectonics.",
+      "geological_data": {
+        "composition": "Silicates, oxides, and metallic core.",
+        "core": "Solid inner core and liquid outer core generating the magnetosphere.",
+        "surface": "71% covered by liquid water. Crust divided into tectonic plates."
+      },
+      "atmospheric_data": {
+        "summary": "Ideal for life, rich in oxidants.",
+        "details": "Layers protect from UV radiation and meteoroids. Maintains temperature via natural greenhouse effect.",
+        "main_components": ["Nitrogen (78%)", "Oxygen (21%)", "Argon (0.9%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": true,
+        "count": 1,
+        "list": ["Moon"]
+      },
+      "space_missions": [
+        {
+          "name": "Apollo Program",
+          "agency": "NASA",
+          "year": "1961-1972",
+          "feat": "Humans landed on the Moon and viewed Earth from a distance."
+        },
+        {
+          "name": "ISS",
+          "agency": "International",
+          "year": "1998-Present",
+          "feat": "Continuous laboratory in low orbit."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 12742,
+        "distance_from_sun_au": 1.0,
+        "distance_from_sun_km": 149600000,
+        "gravity_ms2": 9.8,
+        "avg_temperature_c": 15,
+        "orbital_period": "365.25 days",
+        "rotation_period": "23h 56m"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Mars",
+      "type": "Terrestrial",
+      "slug": "mars",
+      "presentation": "The Red Planet, a cold desert world with a watery past.",
+      "ui_theme": {
+        "primary_color": "#D54526",
+        "secondary_color": "#8C2210"
+      },
+      "earth_comparison": {
+        "size": "0.53x Earth (about half the size)",
+        "gravity": "0.38x Earth (you could jump 3x higher)",
+        "day_length": "24h 37m (very similar to Earth)"
+      },
+      "culture": {
+        "name_origin": "Named after the Roman god of war due to its blood-red color.",
+        "astronomical_symbol": "♂"
+      },
+      "curiosities": [
+        "Sunsets on Mars appear blue.",
+        "Home to Olympus Mons, a volcano 3x taller than Mt. Everest.",
+        "Has the largest canyon system in the solar system, Valles Marineris."
+      ],
+      "description": "Mars is a dusty, cold world with a very thin atmosphere. It is famous for its reddish color caused by iron oxide (rust). There is strong geological evidence that it once had liquid water rivers and lakes.",
+      "geological_data": {
+        "composition": "Volcanic basalt rich in iron.",
+        "core": "Dense core of iron, nickel, and sulfur, possibly inactive.",
+        "surface": "Features polar ice caps, extinct volcanoes, sand dunes, and dry riverbeds."
+      },
+      "atmospheric_data": {
+        "summary": "Very thin and toxic.",
+        "details": "Atmospheric pressure is less than 1% of Earth's. Global dust storms can persist for months.",
+        "main_components": ["Carbon Dioxide (95%)", "Nitrogen (2.8%)", "Argon (2%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": true,
+        "count": 2,
+        "list": ["Phobos", "Deimos"]
+      },
+      "space_missions": [
+        {
+          "name": "Viking 1 & 2",
+          "agency": "NASA",
+          "year": "1975",
+          "feat": "First successful landings sending color images."
+        },
+        {
+          "name": "Perseverance",
+          "agency": "NASA",
+          "year": "2021-Present",
+          "feat": "Searching for signs of ancient life and collecting samples."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 6779,
+        "distance_from_sun_au": 1.5,
+        "distance_from_sun_km": 227940000,
+        "gravity_ms2": 3.71,
+        "avg_temperature_c": -63,
+        "orbital_period": "687 Earth days",
+        "rotation_period": "24h 37m"
+      }
+    },
+    {
+      "id": 5,
+      "name": "Jupiter",
+      "type": "Gas Giant",
+      "slug": "jupiter",
+      "presentation": "The King of Planets, a massive giant protecting the inner solar system.",
+      "ui_theme": {
+        "primary_color": "#D9A066",
+        "secondary_color": "#8F5E38"
+      },
+      "earth_comparison": {
+        "size": "11x Earth (diameter)",
+        "gravity": "2.5x Earth (crushing gravity)",
+        "day_length": "9h 55m (shortest day of all planets)"
+      },
+      "culture": {
+        "name_origin": "Named after the king of the Roman gods.",
+        "astronomical_symbol": "♃"
+      },
+      "curiosities": [
+        "The Great Red Spot is a storm bigger than Earth that has raged for centuries.",
+        "It acts as a 'vacuum cleaner', attracting comets and asteroids away from Earth.",
+        "It has faint rings."
+      ],
+      "description": "Jupiter is the largest planet in the solar system, with more than twice the mass of all other planets combined. It is a gas giant composed mainly of hydrogen and helium.",
+      "geological_data": {
+        "composition": "Liquid metallic hydrogen in deep layers.",
+        "core": "Likely a dense rocky core surrounded by metallic hydrogen under extreme pressure.",
+        "surface": "No solid surface. Transition from gas to liquid is gradual."
+      },
+      "atmospheric_data": {
+        "summary": "Turbulent and colorful.",
+        "details": "Banded with clouds of ammonia and water rotating in opposite directions, creating massive storms.",
+        "main_components": ["Hydrogen (90%)", "Helium (10%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": true,
+        "count": 95,
+        "list": ["Io", "Europa", "Ganymede", "Callisto"]
+      },
+      "space_missions": [
+        {
+          "name": "Galileo",
+          "agency": "NASA",
+          "year": "1989-2003",
+          "feat": "First probe to orbit Jupiter."
+        },
+        {
+          "name": "Juno",
+          "agency": "NASA",
+          "year": "2011-Present",
+          "feat": "Studying the planet's deep structure and magnetic field."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 139820,
+        "distance_from_sun_au": 5.2,
+        "distance_from_sun_km": 778500000,
+        "gravity_ms2": 24.79,
+        "avg_temperature_c": -108,
+        "orbital_period": "11.8 Earth years",
+        "rotation_period": "9h 55m"
+      }
+    },
+    {
+      "id": 6,
+      "name": "Saturn",
+      "type": "Gas Giant",
+      "slug": "saturn",
+      "presentation": "The Jewel of the Solar System, famous for its complex ring system.",
+      "ui_theme": {
+        "primary_color": "#EAD6B8",
+        "secondary_color": "#A8936D"
+      },
+      "earth_comparison": {
+        "size": "9x Earth (diameter)",
+        "gravity": "1.06x Earth (surprisingly similar to Earth)",
+        "day_length": "10h 33m"
+      },
+      "culture": {
+        "name_origin": "Named after the Roman god of agriculture and wealth.",
+        "astronomical_symbol": "♄"
+      },
+      "curiosities": [
+        "It is the least dense planet; it would float in a giant bathtub.",
+        "It has a hexagonal-shaped storm at its north pole.",
+        "Its rings are made of ice chunks ranging from dust to house-sized boulders."
+      ],
+      "description": "Saturn is the second-largest planet and unmistakable due to its thousands of rings made of ice and rock. Like Jupiter, it is a massive ball made mostly of hydrogen and helium.",
+      "geological_data": {
+        "composition": "Similar to Jupiter but less dense.",
+        "core": "Small rocky core surrounded by metallic hydrogen and liquid helium.",
+        "surface": "Gaseous/Liquid with no defined boundary."
+      },
+      "atmospheric_data": {
+        "summary": "Supersonic winds and golden storms.",
+        "details": "Upper atmosphere winds can reach 1,800 km/h. Pale yellow color due to ammonia crystals.",
+        "main_components": ["Hydrogen (96%)", "Helium (3%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": true,
+        "count": 146,
+        "list": ["Titan", "Enceladus", "Rhea", "Mimas"]
+      },
+      "space_missions": [
+        {
+          "name": "Cassini-Huygens",
+          "agency": "NASA/ESA",
+          "year": "1997-2017",
+          "feat": "Orbited Saturn for 13 years; landed a probe on Titan."
+        },
+        {
+          "name": "Voyager 1 & 2",
+          "agency": "NASA",
+          "year": "1980-1981",
+          "feat": "Flybys revealed ring complexity and new moons."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 116460,
+        "distance_from_sun_au": 9.5,
+        "distance_from_sun_km": 1434000000,
+        "gravity_ms2": 10.44,
+        "avg_temperature_c": -139,
+        "orbital_period": "29.4 Earth years",
+        "rotation_period": "10h 33m"
+      }
+    },
+    {
+      "id": 7,
+      "name": "Uranus",
+      "type": "Ice Giant",
+      "slug": "uranus",
+      "presentation": "The Sideways Planet, a blue-green world of icy mysteries.",
+      "ui_theme": {
+        "primary_color": "#4FD0E7",
+        "secondary_color": "#287E91"
+      },
+      "earth_comparison": {
+        "size": "4x Earth (diameter)",
+        "gravity": "0.89x Earth (weaker than Earth)",
+        "day_length": "17h 14m"
+      },
+      "culture": {
+        "name_origin": "Named after the Greek god of the sky (the only planet named after a Greek god).",
+        "astronomical_symbol": "♅"
+      },
+      "curiosities": [
+        "It rotates on its side, rolling like a ball around the Sun.",
+        "It was the first planet discovered with a telescope.",
+        "Its moons are named after characters from Shakespeare and Alexander Pope."
+      ],
+      "description": "Uranus is unique because it rotates 'on its side', with an axial tilt of nearly 98 degrees. This causes extreme seasons lasting 20 years. It is an Ice Giant, composed of dense fluids of 'icy' materials.",
+      "geological_data": {
+        "composition": "Icy mantle (water, ammonia, methane fluids).",
+        "core": "Small rocky core.",
+        "surface": "No solid surface; atmosphere merges with icy mantle."
+      },
+      "atmospheric_data": {
+        "summary": "Cold and calm (apparently).",
+        "details": "Methane absorbs red light, giving it a blue-green color. It has the coldest planetary atmosphere.",
+        "main_components": ["Hydrogen (83%)", "Helium (15%)", "Methane (2%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": true,
+        "count": 27,
+        "list": ["Titania", "Oberon", "Miranda", "Ariel"]
+      },
+      "space_missions": [
+        {
+          "name": "Voyager 2",
+          "agency": "NASA",
+          "year": "1986",
+          "feat": "Only spacecraft to visit Uranus. Discovered 10 new moons."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 50724,
+        "distance_from_sun_au": 19.2,
+        "distance_from_sun_km": 2871000000,
+        "gravity_ms2": 8.69,
+        "avg_temperature_c": -220,
+        "orbital_period": "84 Earth years",
+        "rotation_period": "17h 14m (retrograde)"
+      }
+    },
+    {
+      "id": 8,
+      "name": "Neptune",
+      "type": "Ice Giant",
+      "slug": "neptune",
+      "presentation": "The Windy Planet, the most distant major world from the Sun.",
+      "ui_theme": {
+        "primary_color": "#3E54E8",
+        "secondary_color": "#212E85"
+      },
+      "earth_comparison": {
+        "size": "3.9x Earth (very similar to Uranus)",
+        "gravity": "1.14x Earth (slightly stronger)",
+        "day_length": "16h 06m"
+      },
+      "culture": {
+        "name_origin": "Named after the Roman god of the sea.",
+        "astronomical_symbol": "♆"
+      },
+      "curiosities": [
+        "It has the fastest winds in the solar system (over 2,000 km/h).",
+        "It was discovered by math before it was seen by telescope.",
+        "Its large moon Triton orbits backwards."
+      ],
+      "description": "Neptune is dark, cold, and whipped by supersonic winds. Its vivid blue color is more intense than Uranus's. It was the first planet located through mathematical calculations.",
+      "geological_data": {
+        "composition": "Similar to Uranus, rich in water, ammonia, and methane.",
+        "core": "Solid rocky core about the size of Earth.",
+        "surface": "Fluid, gradual transition from gas to supercritical ocean."
+      },
+      "atmospheric_data": {
+        "summary": "Dynamic and stormy.",
+        "details": "Features dark storm systems. White clouds of frozen methane float in the upper atmosphere.",
+        "main_components": ["Hydrogen (80%)", "Helium (19%)", "Methane (1.5%)"]
+      },
+      "natural_satellites": {
+        "has_satellites": true,
+        "count": 14,
+        "list": ["Triton", "Proteus", "Nereid"]
+      },
+      "space_missions": [
+        {
+          "name": "Voyager 2",
+          "agency": "NASA",
+          "year": "1989",
+          "feat": "Only spacecraft to visit Neptune. Confirmed rings and 6 moons."
+        }
+      ],
+      "technical_data": {
+        "diameter_km": 49244,
+        "distance_from_sun_au": 30.1,
+        "distance_from_sun_km": 4495000000,
+        "gravity_ms2": 11.15,
+        "avg_temperature_c": -214,
+        "orbital_period": "165 Earth years",
+        "rotation_period": "16h 06m"
+      }
+    }
+  ]
+}

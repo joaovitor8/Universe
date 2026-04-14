@@ -12,7 +12,7 @@ type SolarFlare = {
   flrID: string;
   beginTime: string;
   peakTime: string;
-  endTime: string | null;
+  endTime: string;
   classType: string;
   sourceLocation: string;
 };
