@@ -19,11 +19,11 @@ export async function GET() {
 
     // 3. Buscamos os detalhes de cada projeto em paralelo usando Promise.all
     const detailedProjects = await Promise.all(
-      topProjects.map(async (p: any) => {
+      topProjects.map(async (p: { id: number | string }) => {
         try {
           const detailRes = await axios.get(`https://techport.nasa.gov/api/projects/${p.id}`);
           return detailRes.data.project; // O projeto detalhado
-        } catch (e) {
+        } catch {
           return null; // Se um falhar, não quebra tudo
         }
       })

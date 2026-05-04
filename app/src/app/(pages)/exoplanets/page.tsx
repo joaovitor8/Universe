@@ -1,244 +1,289 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Database, Globe2, Loader2, Orbit, Ruler, Scale, Search, Telescope,Wifi } from "lucide-react";
+import {
+  Database,
+  Globe2,
+  Orbit,
+  Ruler,
+  Scale,
+  Search,
+  Telescope,
+  Wifi,
+} from "lucide-react";
 import axios from "axios";
 
+import { getModule } from "@/src/lib/modules";
+import type { ExoplanetRow } from "@/src/lib/types/nasa";
+import {
+  CommsFailure,
+  DataMatrix,
+  ModuleScope,
+  TelemetrySpinner,
+  type DataPoint,
+} from "@/src/components/hud";
 
-// Tipagem baseada na nossa Query SQL
-type Exoplanet = {
-  pl_name: string;          // Nome do Planeta
-  hostname: string;         // Estrela Hospedeira
-  discoverymethod: string;  // Método de Descoberta
-  disc_year: number;        // Ano
-  pl_rade: number | null;   // Raio (Em raios terrestres)
-  pl_bmasse: number | null; // Massa (Em massas terrestres)
-  pl_orbper: number | null; // Período Orbital (Dias)
-  sy_dist: number | null;   // Distância (Parsecs)
-};
+const MODULE = getModule("exoplanets")!;
 
-
-const fetchExoplanets = async (): Promise<Exoplanet[]> => {
-  const res = await axios.get<Exoplanet[]>("/api/exoplanets");
+const fetchExoplanets = async (): Promise<ExoplanetRow[]> => {
+  const res = await axios.get<ExoplanetRow[]>("/api/exoplanets");
   return res.data;
 };
 
-
 export default function ExoplanetsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPlanet, setSelectedPlanet] = useState<Exoplanet | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const { data: exoplanets, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["exoplanets"],
     queryFn: fetchExoplanets,
   });
 
-  // Filtro de busca local
-  const filteredPlanets = exoplanets?.filter(planet => 
-    planet.pl_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    planet.hostname.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    const t = searchTerm.toLowerCase();
+    return data.filter(
+      (p) =>
+        p.pl_name.toLowerCase().includes(t) ||
+        p.hostname.toLowerCase().includes(t),
+    );
+  }, [data, searchTerm]);
 
-  // Se não houver planeta selecionado, seleciona o primeiro por padrão
-  if (filteredPlanets.length > 0 && !selectedPlanet) {
-    setSelectedPlanet(filteredPlanets[0]);
-  }
+  const selected = useMemo(() => {
+    if (filtered.length === 0) return null;
+    if (selectedId) {
+      const found = filtered.find((p) => p.pl_name === selectedId);
+      if (found) return found;
+    }
+    return filtered[0];
+  }, [filtered, selectedId]);
 
+  const tech: DataPoint[] = selected
+    ? [
+        {
+          label: "Massa",
+          value: selected.pl_bmasse?.toFixed(2) ?? "—",
+          unit: "M⊕",
+        },
+        {
+          label: "Raio",
+          value: selected.pl_rade?.toFixed(2) ?? "—",
+          unit: "R⊕",
+        },
+        {
+          label: "Período",
+          value: selected.pl_orbper?.toFixed(1) ?? "—",
+          unit: "dias",
+        },
+        {
+          label: "Distância",
+          value: selected.sy_dist?.toFixed(0) ?? "—",
+          unit: "pc",
+        },
+      ]
+    : [];
 
   return (
-    <div className="min-h-screen pt-12 pb-24 px-4 sm:px-8 flex flex-col">
-      
-      {/* Background Decorativo Nebulosa */}
-      <div className="fixed top-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none -z-10" />
-
-      <div className="max-w-400 w-full mx-auto grow flex flex-col">
-        
-        {/* HEADER */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
+    <ModuleScope theme={MODULE.theme} ambient className="min-h-screen pt-12 pb-24 px-4 sm:px-8">
+      <div className="max-w-[100rem] mx-auto w-full flex flex-col">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b border-white/10 pb-6"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 backdrop-blur-md">
-              <Database className="w-8 h-8 text-emerald-400" />
+            <div
+              className="p-3 rounded-2xl border backdrop-blur-md"
+              style={{
+                background: "var(--module-accent-soft)",
+                borderColor: "color-mix(in oklch, var(--module-accent) 30%, transparent)",
+              }}
+            >
+              <Database className="w-7 h-7" style={{ color: "var(--module-accent)" }} />
             </div>
             <div>
-              <h1 className="font-serif text-3xl font-bold tracking-tight text-white mb-1">
+              <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-muted-foreground/70 block">
+                {MODULE.codename}
+              </span>
+              <h1 className="font-serif text-2xl md:text-3xl font-bold tracking-tight">
                 Catálogo Exoplanetário
               </h1>
-              <p className="text-sm text-emerald-500/70 flex items-center gap-2 font-mono uppercase tracking-widest">
-                <Wifi className="w-4 h-4" /> NASA Exoplanet Archive
+              <p className="text-xs font-mono uppercase tracking-widest flex items-center gap-2" style={{ color: "var(--module-accent)" }}>
+                <Wifi className="w-3.5 h-3.5" /> NASA Exoplanet Archive
               </p>
             </div>
           </div>
 
-          <div className="relative group w-full md:w-auto">
-            <input 
-              type="text" 
-              placeholder="Buscar planeta ou estrela..."
+          <div className="relative w-full md:w-72">
+            <input
+              type="text"
+              placeholder="Buscar planeta ou estrela…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full md:w-72 bg-black/40 text-foreground text-sm border border-white/10 rounded-full pl-11 pr-4 py-2.5 outline-none focus:border-emerald-500/50 transition-all backdrop-blur-sm"
+              className="w-full bg-black/40 border border-white/10 rounded-full pl-11 pr-4 py-2.5 outline-none focus:border-[var(--module-accent)] transition-colors text-sm font-mono backdrop-blur-sm"
             />
-            <Search className="w-4 h-4 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2" />
           </div>
         </motion.div>
 
         {error ? (
-          <div className="p-8 border border-destructive/30 bg-destructive/10 rounded-3xl text-destructive text-center">
-            Sinal perdido. Não foi possível conectar ao banco de dados estelar.
-          </div>
+          <CommsFailure
+            message="Sinal perdido. Não foi possível conectar ao banco estelar."
+            onRetry={() => refetch()}
+          />
         ) : isLoading ? (
-          <div className="grow flex flex-col items-center justify-center gap-4">
-            <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
-            <p className="font-mono text-sm uppercase tracking-widest text-emerald-500 animate-pulse">
-              Baixando registros estelares...
-            </p>
-          </div>
+          <TelemetrySpinner
+            label="DEEP CATALOG"
+            phases={[
+              "Conectando ao Caltech TAP",
+              "Baixando registros confirmados",
+              "Filtrando por flag default",
+              "Compilando exoplanetas",
+            ]}
+          />
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6 grow h-full lg:h-[120vh]">
-            
-            {/* SIDEBAR: Lista de Planetas (Master) */}
+          <div className="flex flex-col lg:flex-row gap-4 grow lg:h-[120vh]">
+            {/* Lista */}
             <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-black/40 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-md">
-              <div className="p-4 border-b border-white/10 bg-white/5 text-xs font-mono text-muted-foreground uppercase tracking-widest flex justify-between">
+              <div className="p-4 border-b border-white/10 bg-white/5 text-[10px] font-mono uppercase tracking-[0.2em] flex justify-between text-muted-foreground">
                 <span>Registro</span>
-                <span>{filteredPlanets.length} Encontrados</span>
+                <span style={{ color: "var(--module-accent)" }}>{filtered.length} encontrados</span>
               </div>
-              
-              <div className="grow overflow-y-auto custom-scrollbar p-2 space-y-1">
-                {filteredPlanets.map((planet) => {
-                  const isSelected = selectedPlanet?.pl_name === planet.pl_name;
+              <div className="grow overflow-y-auto p-2 space-y-1">
+                {filtered.map((p) => {
+                  const active = selected?.pl_name === p.pl_name;
                   return (
                     <button
-                      key={planet.pl_name}
-                      onClick={() => setSelectedPlanet(planet)}
-                      className={`w-full text-left p-4 rounded-2xl transition-all flex justify-between items-center group ${
-                        isSelected 
-                          ? "bg-emerald-500/10 border border-emerald-500/30" 
-                          : "border border-transparent hover:bg-white/5"
-                      }`}
+                      key={p.pl_name}
+                      onClick={() => setSelectedId(p.pl_name)}
+                      className="w-full text-left p-4 rounded-2xl transition-all flex justify-between items-center group border"
+                      style={
+                        active
+                          ? {
+                              background: "var(--module-accent-soft)",
+                              borderColor: "color-mix(in oklch, var(--module-accent) 35%, transparent)",
+                            }
+                          : { borderColor: "transparent" }
+                      }
                     >
-                      <div>
-                        <h3 className={`font-bold font-serif text-lg ${isSelected ? "text-emerald-400" : "text-white group-hover:text-emerald-300"}`}>
-                          {planet.pl_name}
+                      <div className="overflow-hidden">
+                        <h3
+                          className="font-serif font-bold text-base truncate transition-colors"
+                          style={active ? { color: "var(--module-accent)" } : undefined}
+                        >
+                          {p.pl_name}
                         </h3>
-                        <p className="text-xs text-muted-foreground font-mono mt-1">
-                          Estrela: {planet.hostname}
+                        <p className="text-[10px] font-mono text-muted-foreground/70 mt-0.5 truncate">
+                          ★ {p.hostname}
                         </p>
                       </div>
-                      <span className="text-xs font-mono text-white/30">{planet.disc_year}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground/60 shrink-0">
+                        {p.disc_year ?? "—"}
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* PAINEL PRINCIPAL: Escaneamento Detalhado (Detail) */}
+            {/* Detalhe */}
             <div className="w-full lg:w-2/3 xl:w-3/4 bg-black/40 border border-white/10 rounded-3xl p-6 md:p-10 backdrop-blur-md flex flex-col relative overflow-hidden">
-              
               <AnimatePresence mode="wait">
-                {selectedPlanet ? (
+                {selected ? (
                   <motion.div
-                    key={selectedPlanet.pl_name}
-                    initial={{ opacity: 0, x: 20 }}
+                    key={selected.pl_name}
+                    initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    exit={{ opacity: 0, x: -16 }}
                     transition={{ duration: 0.3 }}
                     className="flex flex-col h-full"
                   >
-                    
-                    {/* Header do Planeta */}
                     <div className="flex flex-wrap justify-between items-start gap-4 mb-10 relative z-10">
                       <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-4">
-                          <Globe2 className="w-3.5 h-3.5" />
+                        <div
+                          className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-[0.25em] mb-4 border"
+                          style={{
+                            background: "var(--module-accent-soft)",
+                            color: "var(--module-accent)",
+                            borderColor: "color-mix(in oklch, var(--module-accent) 30%, transparent)",
+                          }}
+                        >
+                          <Globe2 className="w-3 h-3" />
                           Planeta Confirmado
                         </div>
-                        <h2 className="text-4xl md:text-6xl font-serif font-bold text-white mb-2 drop-shadow-md">
-                          {selectedPlanet.pl_name}
+                        <h2 className="text-4xl md:text-6xl font-serif font-bold mb-2 leading-tight">
+                          {selected.pl_name}
                         </h2>
-                        <p className="text-muted-foreground text-lg flex items-center gap-2">
-                          <Orbit className="w-5 h-5" /> Orbitando: <span className="text-white font-medium">{selectedPlanet.hostname}</span>
+                        <p className="text-muted-foreground text-base flex items-center gap-2">
+                          <Orbit className="w-5 h-5" /> Orbitando ★ <span className="text-foreground font-medium">{selected.hostname}</span>
                         </p>
                       </div>
 
                       <div className="text-right">
-                        <span className="block text-xs text-muted-foreground uppercase tracking-widest mb-1">Descoberto em</span>
-                        <span className="text-3xl font-mono text-white">{selectedPlanet.disc_year}</span>
-                        <span className="block text-xs text-muted-foreground mt-2 border-t border-white/10 pt-2">
-                          Método: {selectedPlanet.discoverymethod}
+                        <span className="block text-[10px] text-muted-foreground/70 font-mono uppercase tracking-[0.2em] mb-1">
+                          Descoberto
                         </span>
+                        <span className="text-3xl font-mono tabular-nums" style={{ color: "var(--module-accent)" }}>
+                          {selected.disc_year ?? "—"}
+                        </span>
+                        {selected.discoverymethod && (
+                          <span className="block text-[10px] text-muted-foreground mt-2 border-t border-white/10 pt-2 font-mono uppercase tracking-widest">
+                            {selected.discoverymethod}
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    {/* Gráfico Visual / "Holograma" (Falso, mas esteticamente incrível) */}
-                    <div className="grow flex items-center justify-center relative my-8 min-h-50">
+                    {/* Holograma do planeta */}
+                    <div className="grow flex items-center justify-center relative my-6 min-h-60">
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-64 h-64 border border-emerald-500/20 rounded-full animate-spin-slow" />
-                        <div className="w-48 h-48 border border-white/5 rounded-full absolute animate-reverse-spin" />
-                        <div className="w-32 h-32 bg-linear-to-tr from-emerald-900 to-black rounded-full absolute shadow-[0_0_50px_rgba(16,185,129,0.2)]" />
+                        <div
+                          className="w-72 h-72 rounded-full animate-spin-slow border"
+                          style={{ borderColor: "color-mix(in oklch, var(--module-accent) 25%, transparent)" }}
+                        />
+                        <div className="w-52 h-52 rounded-full absolute border border-white/10" style={{ animation: "spin 24s linear infinite reverse" }} />
+                        <div
+                          className="w-32 h-32 rounded-full absolute"
+                          style={{
+                            background: "linear-gradient(135deg, var(--module-accent) 0%, oklch(0.1 0.02 260) 100%)",
+                            boxShadow: "var(--module-glow)",
+                          }}
+                        />
                       </div>
                     </div>
 
-                    {/* Ficha Técnica (Telemetria) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-auto relative z-10">
-                      
-                      <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm">
-                        <span className="text-xs text-emerald-400 font-mono uppercase tracking-widest flex items-center gap-2 mb-2">
-                          <Scale className="w-4 h-4" /> Massa
-                        </span>
-                        <p className="text-2xl font-light text-white">
-                          {selectedPlanet.pl_bmasse ? selectedPlanet.pl_bmasse.toFixed(2) : "Desconhecida"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">x Massa da Terra</p>
+                    {/* Telemetria */}
+                    <div className="mt-auto relative z-10">
+                      <DataMatrix data={tech} columns={4} />
+                      <div className="grid grid-cols-4 gap-px mt-2 text-[9px] font-mono text-muted-foreground/60 tracking-wider px-3">
+                        <span>x Massa Terra</span>
+                        <span>x Raio Terra</span>
+                        <span>Período local</span>
+                        <span>Parsecs</span>
                       </div>
-
-                      <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm">
-                        <span className="text-xs text-emerald-400 font-mono uppercase tracking-widest flex items-center gap-2 mb-2">
-                          <Ruler className="w-4 h-4" /> Raio
-                        </span>
-                        <p className="text-2xl font-light text-white">
-                          {selectedPlanet.pl_rade ? selectedPlanet.pl_rade.toFixed(2) : "Desconhecido"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">x Raio da Terra</p>
-                      </div>
-
-                      <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm">
-                        <span className="text-xs text-emerald-400 font-mono uppercase tracking-widest flex items-center gap-2 mb-2">
-                          <Orbit className="w-4 h-4" /> Ano Local
-                        </span>
-                        <p className="text-2xl font-light text-white">
-                          {selectedPlanet.pl_orbper ? selectedPlanet.pl_orbper.toFixed(1) : "?"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">Dias Terrestres</p>
-                      </div>
-
-                      <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm">
-                        <span className="text-xs text-emerald-400 font-mono uppercase tracking-widest flex items-center gap-2 mb-2">
-                          <Telescope className="w-4 h-4" /> Distância
-                        </span>
-                        <p className="text-2xl font-light text-white">
-                          {selectedPlanet.sy_dist ? selectedPlanet.sy_dist.toFixed(0) : "?"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">Parsecs da Terra</p>
-                      </div>
-
                     </div>
+
+                    <div className="absolute -bottom-8 -right-8 flex items-center gap-2 opacity-30">
+                      <Telescope className="w-32 h-32" style={{ color: "var(--module-accent)" }} />
+                    </div>
+                    <div className="absolute -top-8 -left-8 flex items-center gap-2 opacity-20">
+                      <Ruler className="w-24 h-24" style={{ color: "var(--module-accent)" }} />
+                    </div>
+                    <Scale className="absolute top-6 right-6 w-5 h-5 text-muted-foreground/30" />
                   </motion.div>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground">
-                    Selecione um planeta no terminal para iniciar o escaneamento.
+                  <div className="h-full flex items-center justify-center text-muted-foreground text-sm font-mono uppercase tracking-widest">
+                    Selecione um planeta para iniciar o escaneamento.
                   </div>
                 )}
               </AnimatePresence>
-
             </div>
           </div>
         )}
       </div>
-    </div>
+    </ModuleScope>
   );
 }

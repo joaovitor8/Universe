@@ -8,8 +8,8 @@ export async function GET(request: Request) {
   const term = searchParams.get("q") || "spaceflight";
 
   try {
-    // A API do OSDR usa um endpoint de busca (geode-py) 
-    const url = "???"
+    // A API do OSDR usa um endpoint de busca (geode-py)
+    const url = `https://osdr.nasa.gov/osdr/data/search?term=${encodeURIComponent(term)}`;
 
     const response = await axios.get(url);
 
