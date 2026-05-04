@@ -1,8 +1,11 @@
+"use client";
+
 import type { ComponentType, SVGProps } from "react";
 import Link from "next/link";
 import { Orbit, Rocket } from "lucide-react";
 
 import { ENABLED_MODULES, SPACE_MODULES } from "@/src/lib/modules";
+import { pickLocale, useLocale } from "@/src/lib/i18n";
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -41,10 +44,10 @@ const LinkedinIcon: IconType = (props) => (
 export function Footer() {
   const year = new Date().getFullYear();
   const planned = SPACE_MODULES.length - ENABLED_MODULES.length;
+  const { t, locale } = useLocale();
 
   return (
     <footer className="relative mt-20 border-t border-white/[0.06] bg-background/95 backdrop-blur-md">
-      {/* divisor decorativo */}
       <div
         aria-hidden
         className="absolute inset-x-0 -top-px h-px"
@@ -55,7 +58,6 @@ export function Footer() {
       />
 
       <div className="container mx-auto px-4 pt-14 pb-8">
-        {/* Topo: brand + links */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
           {/* Brand */}
           <div className="md:col-span-5 flex flex-col gap-4">
@@ -71,9 +73,7 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Console unificada de exploração espacial. Telemetria em tempo real,
-              defesa planetária, cartografia e arquivos da NASA, JPL, Caltech e
-              CelesTrak — uma única jornada de código através do cosmos.
+              {t("footer.description")}
             </p>
 
             <div className="flex items-center gap-3 mt-2">
@@ -93,7 +93,7 @@ export function Footer() {
           {/* Módulos ativos */}
           <div className="md:col-span-3 flex flex-col gap-3">
             <h3 className="text-[10px] font-mono uppercase tracking-[0.3em] text-primary mb-1">
-              Módulos Ativos
+              {t("footer.activeModules")}
             </h3>
             <ul className="flex flex-col gap-2">
               {ENABLED_MODULES.slice(0, 6).map((mod) => (
@@ -109,7 +109,7 @@ export function Footer() {
                         boxShadow: `0 0 8px ${mod.theme.accent}`,
                       }}
                     />
-                    {mod.title}
+                    {pickLocale(mod.title, mod.titleEn, locale)}
                   </Link>
                 </li>
               ))}
@@ -119,18 +119,18 @@ export function Footer() {
           {/* Status da missão */}
           <div className="md:col-span-4 flex flex-col gap-3">
             <h3 className="text-[10px] font-mono uppercase tracking-[0.3em] text-primary mb-1">
-              Status da Missão
+              {t("footer.missionStatus")}
             </h3>
             <div className="grid grid-cols-2 gap-px rounded-lg overflow-hidden border border-white/[0.06] bg-white/[0.04]">
-              <FooterStat label="Online" value={ENABLED_MODULES.length} accent="emerald" />
-              <FooterStat label="Planejados" value={planned} accent="amber" />
+              <FooterStat label={t("footer.online")} value={ENABLED_MODULES.length} accent="emerald" />
+              <FooterStat label={t("footer.planned")} value={planned} accent="amber" />
               <FooterStat label="APIs" value={6} accent="cyan" subtitle="NASA · JPL · Caltech · CelesTrak · ESA · SpaceX" small />
-              <FooterStat label="Console" value="v1.2.0" accent="primary" small />
+              <FooterStat label={t("footer.console")} value="v1.2.0" accent="primary" small />
             </div>
 
             <div className="flex items-center gap-2 mt-2 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_oklch(0.78_0.18_145)]" />
-              Uplink Estável · Latência Nominal
+              {t("footer.uplink")}
             </div>
           </div>
         </div>
@@ -145,7 +145,7 @@ export function Footer() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span>Built with Next.js {"·"} React Three Fiber {"·"} Tailwind v4</span>
+            <span>{t("footer.builtWith")}</span>
           </div>
         </div>
       </div>

@@ -1,16 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Database,
   Globe2,
   Orbit,
-  Ruler,
   Scale,
   Search,
-  Telescope,
   Wifi,
 } from "lucide-react";
 import axios from "axios";
@@ -24,6 +23,21 @@ import {
   TelemetrySpinner,
   type DataPoint,
 } from "@/src/components/hud";
+
+const ExoplanetOrbitScene = dynamic(
+  () => import("@/src/components/scenes/ExoplanetOrbitScene").then((m) => m.ExoplanetOrbitScene),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="w-12 h-12 rounded-full border-2 border-dashed animate-spin-slow"
+          style={{ borderColor: "var(--module-accent)" }}
+        />
+      </div>
+    ),
+  },
+);
 
 const MODULE = getModule("exoplanets")!;
 
@@ -237,21 +251,21 @@ export default function ExoplanetsPage() {
                       </div>
                     </div>
 
-                    {/* Holograma do planeta */}
-                    <div className="grow flex items-center justify-center relative my-6 min-h-60">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div
-                          className="w-72 h-72 rounded-full animate-spin-slow border"
-                          style={{ borderColor: "color-mix(in oklch, var(--module-accent) 25%, transparent)" }}
+                    {/* Visualizador orbital 3D */}
+                    <div className="relative my-6 grow min-h-[22rem] md:min-h-[28rem] rounded-2xl overflow-hidden border border-white/[0.08] bg-black/40">
+                      <ExoplanetOrbitScene
+                        planet={selected}
+                        accent={MODULE.theme.accent}
+                      />
+                      <div className="pointer-events-none absolute top-3 left-3 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground/80">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full animate-pulse"
+                          style={{ background: "var(--module-accent)" }}
                         />
-                        <div className="w-52 h-52 rounded-full absolute border border-white/10" style={{ animation: "spin 24s linear infinite reverse" }} />
-                        <div
-                          className="w-32 h-32 rounded-full absolute"
-                          style={{
-                            background: "linear-gradient(135deg, var(--module-accent) 0%, oklch(0.1 0.02 260) 100%)",
-                            boxShadow: "var(--module-glow)",
-                          }}
-                        />
+                        Volume 3D · Drag para orbitar
+                      </div>
+                      <div className="pointer-events-none absolute bottom-3 right-3 text-[10px] font-mono uppercase tracking-[0.25em]" style={{ color: "var(--module-accent)" }}>
+                        Live render
                       </div>
                     </div>
 
@@ -266,12 +280,6 @@ export default function ExoplanetsPage() {
                       </div>
                     </div>
 
-                    <div className="absolute -bottom-8 -right-8 flex items-center gap-2 opacity-30">
-                      <Telescope className="w-32 h-32" style={{ color: "var(--module-accent)" }} />
-                    </div>
-                    <div className="absolute -top-8 -left-8 flex items-center gap-2 opacity-20">
-                      <Ruler className="w-24 h-24" style={{ color: "var(--module-accent)" }} />
-                    </div>
                     <Scale className="absolute top-6 right-6 w-5 h-5 text-muted-foreground/30" />
                   </motion.div>
                 ) : (

@@ -11,6 +11,7 @@ import {
   getModulesByCategory,
   type ModuleCategory,
 } from "@/src/lib/modules";
+import { pickLocale, useLocale } from "@/src/lib/i18n";
 
 const CATEGORY_ORDER: ModuleCategory[] = [
   "media",
@@ -23,8 +24,12 @@ export function Header() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { t, locale } = useLocale();
 
-  const inModule = pathname !== "/" && pathname !== "/sobre";
+  const inModule =
+    pathname !== "/" &&
+    pathname !== "/sobre" &&
+    pathname !== "/mission-control";
 
   return (
     <>
@@ -52,7 +57,7 @@ export function Header() {
           {/* Nav desktop */}
           <nav className="hidden lg:flex items-center gap-7 text-sm">
             <NavLink href="/" active={pathname === "/"}>
-              Início
+              {t("nav.home")}
             </NavLink>
 
             <div
@@ -67,7 +72,7 @@ export function Header() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Módulos Estelares
+                {t("nav.modules")}
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`}
                 />
@@ -97,11 +102,12 @@ export function Header() {
                         return (
                           <div key={catId} className="flex flex-col gap-3">
                             <div className="flex items-center gap-2 text-primary text-[10px] font-mono uppercase tracking-[0.25em] border-b border-white/[0.08] pb-2 mb-1">
-                              <Icon className="w-3.5 h-3.5" /> {meta.title}
+                              <Icon className="w-3.5 h-3.5" /> {t(`category.${catId}`)}
                             </div>
                             {modules.map((mod) => {
                               const isActive = mod.status === "active";
                               const isCurrent = pathname === mod.href;
+                              const title = pickLocale(mod.title, mod.titleEn, locale);
                               return (
                                 <Link
                                   key={mod.id}
@@ -125,11 +131,11 @@ export function Header() {
                                         className="w-1 h-1 rounded-full bg-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_6px_oklch(0.78_0.18_145)]"
                                       />
                                     )}
-                                    {mod.title}
+                                    {title}
                                   </span>
                                   {!isActive ? (
                                     <span className="text-[8px] font-mono tracking-widest uppercase border border-muted-foreground/15 rounded px-1 py-0.5">
-                                      Soon
+                                      {t("nav.soon")}
                                     </span>
                                   ) : (
                                     <span className="text-[9px] font-mono opacity-40 group-hover:opacity-80 transition-opacity">
@@ -149,24 +155,25 @@ export function Header() {
             </div>
 
             <NavLink href="/sobre" active={pathname === "/sobre"}>
-              Sobre o Projeto
+              {t("nav.about")}
             </NavLink>
           </nav>
 
           {/* Mission Control + mobile toggle */}
           <div className="flex items-center gap-3">
-            <button
+            <Link
+              href="/mission-control"
               className="hidden sm:flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-[0.3em] px-4 py-2.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/60 transition-all hover:scale-[1.03] active:scale-95"
               style={{ boxShadow: "0 0 18px oklch(0.60 0.18 290 / 0.15)" }}
             >
               <Radar className="w-3.5 h-3.5" />
-              Mission Control
-            </button>
+              {t("nav.missionControl")}
+            </Link>
 
             <button
               className="lg:hidden p-2 text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Alternar menu"
+              aria-label={t("nav.menu")}
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -192,12 +199,13 @@ export function Header() {
                 return (
                   <div key={catId} className="flex flex-col gap-3">
                     <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-[0.25em] border-b border-white/10 pb-2">
-                      <Icon className="w-4 h-4" /> {meta.title}
+                      <Icon className="w-4 h-4" /> {t(`category.${catId}`)}
                     </div>
                     <div className="flex flex-col gap-3 pl-2">
                       {modules.map((mod) => {
                         const isActive = mod.status === "active";
                         const isCurrent = pathname === mod.href;
+                        const title = pickLocale(mod.title, mod.titleEn, locale);
                         return (
                           <Link
                             key={mod.id}
@@ -214,10 +222,10 @@ export function Header() {
                                 : "text-muted-foreground/30"
                             }`}
                           >
-                            <span>{mod.title}</span>
+                            <span>{title}</span>
                             {!isActive && (
                               <span className="text-[9px] font-mono tracking-widest uppercase border border-muted-foreground/20 rounded px-1.5 py-0.5">
-                                Soon
+                                {t("nav.soon")}
                               </span>
                             )}
                           </Link>
