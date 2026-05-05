@@ -15,6 +15,7 @@ import {
   Rocket,
   ShieldAlert,
   Sun,
+  Sparkles,
   Telescope,
   Terminal,
   ThermometerSun,
@@ -362,6 +363,22 @@ export const SPACE_MODULES: SpaceModule[] = [
     status: "active",
     size: "lg",
     theme: theme("oklch(0.70 0.13 45)"),
+  },
+  {
+    id: "solar-system",
+    codename: "HELIOSPHERE",
+    title: "Sistema Solar",
+    titleEn: "Solar System",
+    description:
+      "Mapa orbital interativo dos 8 planetas, do Sol e de Plutão — dossiê físico de cada corpo.",
+    descriptionEn:
+      "Interactive orbital map of the 8 planets, the Sun, and Pluto — physical dossier for each body.",
+    href: "/solar-system",
+    icon: Sparkles,
+    category: "science",
+    status: "active",
+    size: "lg",
+    theme: theme("oklch(0.78 0.16 80)"),
   },
 ];
 
