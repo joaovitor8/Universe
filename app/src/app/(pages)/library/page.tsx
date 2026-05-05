@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Film, Library as LibraryIcon, Search, X } from "lucide-react";
@@ -169,11 +169,13 @@ export default function LibraryPage() {
                   onClick={() => setSelected(item)}
                   className="break-inside-avoid relative group cursor-pointer overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-[var(--module-accent)]/50 transition-all w-full text-left"
                 >
-                  <img
+                  <Image
                     src={thumb}
                     alt={meta.title}
-                    loading="lazy"
-                    className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    width={500}
+                    height={500}
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <h3 className="font-bold text-sm line-clamp-2 leading-snug mb-1">
@@ -215,11 +217,13 @@ export default function LibraryPage() {
               onClick={(e) => e.stopPropagation()}
               className="bg-[#05050a] border border-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row max-w-6xl w-full max-h-[90vh]"
             >
-              <div className="w-full md:w-2/3 bg-black flex items-center justify-center p-4">
-                <img
-                  src={selected.links?.[0]?.href}
+              <div className="relative w-full md:w-2/3 bg-black flex items-center justify-center p-4 min-h-[40vh] md:min-h-[60vh]">
+                <Image
+                  src={selected.links?.[0]?.href ?? ""}
                   alt={selected.data[0].title}
-                  className="w-full h-full object-contain max-h-[50vh] md:max-h-[85vh] rounded-xl"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 66vw"
+                  className="object-contain rounded-xl p-4"
                 />
               </div>
 

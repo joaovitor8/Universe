@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -120,10 +120,13 @@ export default function ApodPage() {
               )}
 
               {data?.media_type === "image" && (
-                <img
+                <Image
                   src={data.hdurl || data.url}
                   alt={data.title}
-                  className="w-full h-full object-contain"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1152px"
+                  className="object-contain"
                 />
               )}
               {data?.media_type === "video" && (

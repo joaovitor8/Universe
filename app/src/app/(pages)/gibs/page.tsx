@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cloud, Globe, Layers, ThermometerSun, Wind } from "lucide-react";
@@ -156,16 +157,23 @@ export default function GibsPage() {
             )}
             <AnimatePresence mode="wait">
               {data?.imageUrl && !error && (
-                <motion.img
+                <motion.div
                   key={data.imageUrl}
                   initial={{ opacity: 0, scale: 1.02 }}
                   animate={{ opacity: busy ? 0.3 : 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8 }}
-                  src={data.imageUrl}
-                  alt={`GIBS ${data.layer}`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={data.imageUrl}
+                    alt={`GIBS ${data.layer}`}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 75vw"
+                    className="object-cover"
+                  />
+                </motion.div>
               )}
             </AnimatePresence>
             {/* Corner brackets */}

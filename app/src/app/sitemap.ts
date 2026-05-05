@@ -1,0 +1,24 @@
+import type { MetadataRoute } from "next";
+
+import { ENABLED_MODULES } from "@/src/lib/modules";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://universo.local";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
+  const staticRoutes = ["", "/sobre", "/mission-control"].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: path === "" ? 1 : 0.7,
+  }));
+
+  const moduleRoutes = ENABLED_MODULES.map((m) => ({
+    url: `${SITE_URL}${m.href}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  return [...staticRoutes, ...moduleRoutes];
+}

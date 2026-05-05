@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -209,10 +209,12 @@ export default function MissionControlPage() {
                   <div className="grid md:grid-cols-2 gap-5">
                     <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-black/40 relative">
                       {apod.data.media_type === "image" ? (
-                        <img
+                        <Image
                           src={apod.data.url}
                           alt={apod.data.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 40vw"
+                          className="object-cover"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground font-mono text-xs uppercase tracking-widest">

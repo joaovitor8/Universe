@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Globe, Pause, Play, Search } from "lucide-react";
@@ -134,17 +135,24 @@ export default function EpicPage() {
 
             <AnimatePresence mode="wait">
               {imageUrl && !busy && (
-                <motion.img
+                <motion.div
                   key={imageUrl}
                   initial={{ opacity: 0.5, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0.5 }}
                   transition={{ duration: 0.3 }}
-                  src={imageUrl}
-                  alt="Terra vista do espaço"
-                  className="w-full h-full object-contain rounded-full"
+                  className="absolute inset-0"
                   style={{ filter: "drop-shadow(0 0 60px var(--module-accent-soft))" }}
-                />
+                >
+                  <Image
+                    src={imageUrl}
+                    alt="Terra vista do espaço"
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    className="object-contain rounded-full"
+                  />
+                </motion.div>
               )}
             </AnimatePresence>
           </div>

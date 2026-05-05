@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Cinzel, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -23,10 +23,43 @@ const mono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://universo.local";
+
 export const metadata: Metadata = {
-  title: "Universo | Sistema Operacional do Cosmos",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Universo | Sistema Operacional do Cosmos",
+    template: "%s",
+  },
   description:
     "Plataforma imersiva de exploração espacial. Telemetria, defesa planetária, cartografia e arquivos da NASA em uma única console.",
+  applicationName: "Universo",
+  authors: [{ name: "João Vitor" }],
+  keywords: [
+    "NASA", "espaço", "astronomia", "telemetria", "exoplanetas",
+    "Marte", "asteroides", "SpaceX", "satélites", "cartografia planetária",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Universo",
+    title: "Universo · Sistema Operacional do Cosmos",
+    description:
+      "Console imersivo das APIs da NASA — telemetria, defesa planetária e cartografia em tempo real.",
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Universo · Sistema Operacional do Cosmos",
+    description: "Console imersivo das APIs da NASA.",
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
