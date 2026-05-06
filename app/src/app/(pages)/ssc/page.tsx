@@ -1,259 +1,300 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Calendar, Crosshair, Loader2, LocateFixed, Orbit, Radio, Satellite, Search } from "lucide-react";
+import {
+  Activity,
+  Calendar,
+  Crosshair,
+  LocateFixed,
+  Orbit,
+  Radio,
+  Satellite,
+  Search,
+} from "lucide-react";
 import axios from "axios";
 
+import { getModule } from "@/src/lib/modules";
+import type { Observatory } from "@/src/lib/types/nasa";
+import {
+  CommsFailure,
+  DataMatrix,
+  HudPanel,
+  ModuleScope,
+  TelemetrySpinner,
+  type DataPoint,
+} from "@/src/components/hud";
 
-// Tipagem da API SSC
-type Observatory = {
-  Id: string;
-  Name: string;
-  Resolution: number;
-  StartTime: string;
-  EndTime: string;
-};
-
+const MODULE = getModule("ssc")!;
 
 const fetchObservatories = async (): Promise<Observatory[]> => {
   const res = await axios.get<Observatory[]>("/api/ssc");
-  // A API da NASA tem a peculiaridade de às vezes retornar objetos simples se houver só um, 
-  // mas nossa rota já garante que é um array.
   return res.data;
 };
 
-
-// Utilitário para formatar datas espaciais (ISO 8601 da NASA)
-const formatOrbitalDate = (dateString: string) => {
-  if (!dateString) return "Desconhecido";
-  // As datas do SSC vêm no formato: 2022-01-01T00:00:00Z
-  const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
+const formatOrbitalDate = (dateString?: string) => {
+  if (!dateString) return "—";
+  return new Date(dateString)
+    .toLocaleDateString("pt-BR", { year: "numeric", month: "short", day: "2-digit" })
+    .toUpperCase();
 };
-
 
 export default function SscPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSat, setSelectedSat] = useState<Observatory | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const { data: observatories, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["ssc-observatories"],
     queryFn: fetchObservatories,
-    staleTime: Infinity, // A lista de satélites não muda com frequência
+    staleTime: Infinity,
   });
 
-  // Filtra os satélites localmente para busca ultra-rápida
-  const filteredSats = observatories?.filter(sat => 
-    sat.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sat.Id.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    const t = searchTerm.toLowerCase();
+    return data.filter(
+      (s) =>
+        s.Name.toLowerCase().includes(t) || s.Id.toLowerCase().includes(t),
+    );
+  }, [data, searchTerm]);
 
-  // Auto-seleciona o primeiro satélite para o radar não ficar vazio
-  if (filteredSats.length > 0 && !selectedSat) {
-    setSelectedSat(filteredSats[0]);
-  }
+  const selected = useMemo(() => {
+    if (filtered.length === 0) return null;
+    if (selectedId) {
+      const found = filtered.find((s) => s.Id === selectedId);
+      if (found) return found;
+    }
+    return filtered[0];
+  }, [filtered, selectedId]);
+
+  const tech: DataPoint[] = selected
+    ? [
+        { label: "Lançamento", value: formatOrbitalDate(selected.StartTime) },
+        { label: "Encerramento", value: formatOrbitalDate(selected.EndTime) },
+        { label: "Resolução", value: selected.Resolution ?? "—", unit: "u" },
+        { label: "Resource", value: selected.ResourceId ?? selected.Id },
+      ]
+    : [];
 
   return (
-    <div className="min-h-screen text-violet-50 pt-12 pb-24 px-4 sm:px-8 relative overflow-hidden">
-      
-      {/* Background Eletromagnético */}
-      <div className="fixed top-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-violet-900/10 blur-[150px] pointer-events-none -z-10" />
-      <div className="fixed bottom-0 left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-900/10 blur-[120px] pointer-events-none -z-10" />
-
-      {/* Grid de Coordenadas Fundo */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-size:50px_50px pointer-events-none -z-10" />
-
-      <div className="max-w-400 mx-auto w-full grow flex flex-col h-[calc(100vh-8rem)]">
-        
-        {/* HEADER: Controle de Tráfego */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
+    <ModuleScope theme={MODULE.theme} ambient className="min-h-screen pt-12 pb-24 px-4 sm:px-8">
+      <div className="max-w-[100rem] mx-auto w-full flex flex-col h-[calc(100vh-8rem)]">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b border-violet-900/30 pb-6 shrink-0"
+          className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b border-white/10 pb-6 shrink-0"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-violet-500/10 rounded-xl border border-violet-500/30 relative">
-              <Satellite className="w-8 h-8 text-violet-400 relative z-10" />
-              <div className="absolute inset-0 bg-violet-500/20 blur-md rounded-xl animate-pulse" />
+            <div
+              className="p-3 rounded-xl border relative"
+              style={{
+                background: "var(--module-accent-soft)",
+                borderColor: "color-mix(in oklch, var(--module-accent) 35%, transparent)",
+              }}
+            >
+              <Satellite className="w-7 h-7" style={{ color: "var(--module-accent)" }} />
+              <div
+                className="absolute inset-0 rounded-xl blur-md"
+                style={{ background: "var(--module-accent-soft)", animation: "hud-pulse 3s ease-in-out infinite" }}
+              />
             </div>
             <div>
-              <h1 className="font-serif text-3xl font-bold tracking-tight text-white mb-1">
+              <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-muted-foreground/70 block">
+                {MODULE.codename}
+              </span>
+              <h1 className="font-serif text-2xl md:text-3xl font-bold tracking-tight">
                 Controle de Tráfego Orbital
               </h1>
-              <p className="text-sm text-cyan-400/80 flex items-center gap-2 font-mono uppercase tracking-widest">
-                <Radio className="w-4 h-4" /> Satellite Situation Center (SSC)
+              <p className="text-xs font-mono uppercase tracking-widest flex items-center gap-2" style={{ color: "var(--module-accent)" }}>
+                <Radio className="w-3.5 h-3.5" /> Satellite Situation Center
               </p>
             </div>
           </div>
 
-          <div className="relative group w-full md:w-80">
-            <input 
-              type="text" 
-              placeholder="Buscar sonda ou satélite..."
+          <div className="relative w-full md:w-80">
+            <input
+              type="text"
+              placeholder="Buscar sonda ou satélite…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#0a0718] text-violet-50 border border-violet-900/50 rounded-lg pl-11 pr-4 py-2.5 outline-none focus:border-cyan-500/50 transition-all font-mono text-sm placeholder:text-violet-900"
+              className="w-full bg-black/60 border border-white/10 rounded-lg pl-11 pr-4 py-2.5 outline-none focus:border-[var(--module-accent)] transition-colors font-mono text-sm"
             />
-            <Search className="w-4 h-4 text-violet-700 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-cyan-400 transition-colors pointer-events-none" />
+            <Search className="w-4 h-4 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2" />
           </div>
         </motion.div>
 
         {error ? (
-          <div className="p-8 border border-red-900/30 bg-red-950/20 text-red-500 rounded-2xl flex flex-col items-center justify-center gap-4 font-mono">
-            <Activity className="w-8 h-8" />
-            SISTEMA OFFLINE. FALHA NA RESOLUÇÃO GEOCÊNTRICA.
-          </div>
+          <CommsFailure
+            message="Sistema offline. Falha na resolução geocêntrica."
+            onRetry={() => refetch()}
+          />
         ) : isLoading ? (
-          <div className="grow flex flex-col items-center justify-center gap-4">
-            <Loader2 className="w-12 h-12 text-cyan-500 animate-spin" />
-            <p className="font-mono text-sm uppercase tracking-widest text-violet-400 animate-pulse">
-              Sincronizando coordenadas da frota...
-            </p>
-          </div>
+          <TelemetrySpinner
+            label="ORBIT TRAFFIC"
+            phases={[
+              "Sincronizando coordenadas",
+              "Catalogando frota ativa",
+              "Triangulando observatórios",
+            ]}
+          />
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6 grow min-h-0">
-            
-            {/* SIDEBAR: Frota (Master) */}
-            <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#0a0718]/80 border border-violet-900/30 rounded-2xl overflow-hidden backdrop-blur-md">
-              <div className="p-4 border-b border-violet-900/30 bg-violet-950/20 text-xs font-mono text-cyan-400 uppercase tracking-widest flex justify-between items-center">
-                <span className="flex items-center gap-2"><Orbit className="w-4 h-4" /> Frota Ativa</span>
-                <span className="bg-cyan-900/40 text-cyan-300 px-2 py-0.5 rounded border border-cyan-800">{filteredSats.length}</span>
+          <div className="flex flex-col lg:flex-row gap-4 grow min-h-0">
+            {/* Lista */}
+            <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-black/40 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md">
+              <div className="p-4 border-b border-white/10 bg-white/5 text-[10px] font-mono uppercase tracking-[0.2em] flex justify-between items-center">
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Orbit className="w-3.5 h-3.5" /> Frota
+                </span>
+                <span
+                  className="px-2 py-0.5 rounded border font-bold"
+                  style={{
+                    background: "var(--module-accent-soft)",
+                    color: "var(--module-accent)",
+                    borderColor: "color-mix(in oklch, var(--module-accent) 30%, transparent)",
+                  }}
+                >
+                  {filtered.length}
+                </span>
               </div>
-              
-              <div className="grow overflow-y-auto custom-scrollbar p-2 space-y-1">
-                {filteredSats.map((sat) => {
-                  const isActive = selectedSat?.Id === sat.Id;
+              <div className="grow overflow-y-auto p-2 space-y-1">
+                {filtered.map((sat) => {
+                  const active = selected?.Id === sat.Id;
                   return (
                     <button
                       key={sat.Id}
-                      onClick={() => setSelectedSat(sat)}
-                      className={`w-full text-left p-4 rounded-xl transition-all flex items-center justify-between group ${
-                        isActive 
-                          ? "bg-violet-900/40 border border-violet-500/50 shadow-[inset_0_0_20px_rgba(139,92,246,0.1)]" 
-                          : "border border-transparent hover:bg-violet-900/20"
-                      }`}
+                      onClick={() => setSelectedId(sat.Id)}
+                      className="w-full text-left p-3.5 rounded-xl transition-all flex items-center justify-between group border"
+                      style={
+                        active
+                          ? {
+                              background: "var(--module-accent-soft)",
+                              borderColor: "color-mix(in oklch, var(--module-accent) 35%, transparent)",
+                              boxShadow: "inset 0 0 24px color-mix(in oklch, var(--module-accent) 10%, transparent)",
+                            }
+                          : { borderColor: "transparent" }
+                      }
                     >
                       <div className="overflow-hidden">
-                        <h3 className={`font-bold font-mono text-sm truncate ${isActive ? "text-cyan-300" : "text-violet-100 group-hover:text-cyan-100"}`}>
+                        <h3
+                          className="font-mono font-bold text-sm truncate"
+                          style={active ? { color: "var(--module-accent)" } : undefined}
+                        >
                           {sat.Name}
                         </h3>
-                        <p className="text-xs text-violet-500/70 font-mono mt-1">
+                        <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5">
                           ID: {sat.Id}
                         </p>
                       </div>
-                      {isActive && <LocateFixed className="w-4 h-4 text-cyan-400 shrink-0" />}
+                      {active && (
+                        <LocateFixed className="w-4 h-4 shrink-0" style={{ color: "var(--module-accent)" }} />
+                      )}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* PAINEL PRINCIPAL: Radar e Telemetria (Detail) */}
-            <div className="w-full lg:w-2/3 xl:w-3/4 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
-              
+            {/* Detalhe */}
+            <div className="w-full lg:w-2/3 xl:w-3/4 flex flex-col gap-4 overflow-y-auto">
               <AnimatePresence mode="wait">
-                {selectedSat ? (
+                {selected ? (
                   <motion.div
-                    key={selectedSat.Id}
+                    key={selected.Id}
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex flex-col xl:flex-row gap-6 h-full"
+                    transition={{ duration: 0.3 }}
+                    className="flex flex-col xl:flex-row gap-4 h-full"
                   >
-                    
-                    {/* O RADAR (Visualização) */}
-                    <div className="w-full xl:w-1/2 bg-[#0a0718]/80 border border-violet-900/30 rounded-2xl p-6 flex flex-col items-center justify-center relative min-h-100 overflow-hidden">
-                      {/* Círculos do Radar */}
+                    {/* Radar */}
+                    <div className="w-full xl:w-1/2 bg-black/40 border border-white/10 rounded-2xl p-6 flex items-center justify-center relative min-h-[26rem] overflow-hidden">
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-64 h-64 rounded-full border border-violet-500/20 absolute" />
-                        <div className="w-48 h-48 rounded-full border border-violet-500/30 absolute" />
-                        <div className="w-32 h-32 rounded-full border border-violet-500/40 absolute" />
-                        <div className="w-2 h-2 rounded-full bg-cyan-400 absolute shadow-[0_0_15px_rgba(34,211,238,1)]" />
-                        
-                        {/* Linha de Varredura (Animação pura no Tailwind) */}
-                        <div className="w-32 h-32 absolute top-1/2 left-1/2 origin-top-left border-l-2 border-cyan-400/50 bg-linear-to-br from-cyan-400/10 to-transparent animate-spin-slow" />
+                        {[64, 48, 32].map((s) => (
+                          <div
+                            key={s}
+                            className="absolute rounded-full border"
+                            style={{
+                              width: `${s * 4}px`,
+                              height: `${s * 4}px`,
+                              borderColor: `color-mix(in oklch, var(--module-accent) ${s / 2}%, transparent)`,
+                            }}
+                          />
+                        ))}
+                        <div
+                          className="w-2 h-2 rounded-full absolute"
+                          style={{
+                            background: "var(--module-accent)",
+                            boxShadow: "0 0 16px var(--module-accent)",
+                          }}
+                        />
+                        <div
+                          className="w-32 h-32 absolute top-1/2 left-1/2 origin-top-left animate-spin-slow"
+                          style={{
+                            borderLeft: "2px solid var(--module-accent)",
+                            background: "linear-gradient(to bottom right, var(--module-accent-soft), transparent)",
+                            opacity: 0.5,
+                          }}
+                        />
                       </div>
 
-                      {/* Info do Radar */}
-                      <div className="absolute top-6 left-6 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                        <span className="text-xs font-mono text-red-400 tracking-widest uppercase">Rastreando</span>
+                      <div className="absolute top-5 left-5 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--module-accent)" }} />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.25em]" style={{ color: "var(--module-accent)" }}>
+                          Rastreando
+                        </span>
                       </div>
-                      
-                      <div className="absolute bottom-6 right-6 text-right">
-                        <span className="block text-[10px] font-mono text-violet-500/60 uppercase tracking-widest">Alvo Atual</span>
-                        <span className="text-sm font-mono text-cyan-400 font-bold">{selectedSat.Id}</span>
+                      <div className="absolute bottom-5 right-5 text-right">
+                        <span className="block text-[9px] font-mono text-muted-foreground/70 uppercase tracking-widest">
+                          Alvo Atual
+                        </span>
+                        <span className="text-sm font-mono font-bold" style={{ color: "var(--module-accent)" }}>
+                          {selected.Id}
+                        </span>
                       </div>
                     </div>
 
-                    {/* DADOS DA SONDA (Telemetria) */}
+                    {/* Telemetria */}
                     <div className="w-full xl:w-1/2 flex flex-col gap-4">
-                      
-                      {/* Card de Título */}
-                      <div className="bg-[#0a0718]/80 border border-violet-900/30 rounded-2xl p-8 backdrop-blur-md">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-cyan-900/20 border border-cyan-900/50 text-cyan-400 text-[10px] font-mono font-bold uppercase tracking-widest mb-4">
-                          <Crosshair className="w-3.5 h-3.5" />
-                          Lock Estabelecido
-                        </div>
-                        <h2 className="text-3xl font-serif font-bold text-white mb-2 leading-tight">
-                          {selectedSat.Name}
+                      <HudPanel
+                        label="Lock Estabelecido"
+                        badge={
+                          <Crosshair className="w-3.5 h-3.5" style={{ color: "var(--module-accent)" }} />
+                        }
+                      >
+                        <h2 className="text-2xl md:text-3xl font-serif font-bold leading-tight mb-3">
+                          {selected.Name}
                         </h2>
-                        <p className="text-violet-400 font-mono text-sm border-t border-violet-900/50 pt-4 mt-4">
-                          Sistema Integrado de Situação de Satélites
+                        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground border-t border-white/5 pt-3">
+                          Sistema integrado de situação de satélites
                         </p>
+                      </HudPanel>
+
+                      <DataMatrix data={tech} columns={2} />
+
+                      <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground/70 px-1 mt-1">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3" /> Início Op.
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Activity className="w-3 h-3" /> Fim Op.
+                        </span>
+                        <span>Resolução</span>
+                        <span>Resource</span>
                       </div>
-
-                      {/* Grid de Metadados */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 grow">
-                        
-                        <div className="bg-[#0a0718]/80 border border-violet-900/30 rounded-2xl p-6 flex flex-col justify-center">
-                          <span className="text-xs text-violet-500 uppercase tracking-widest font-mono flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4" /> Lançamento / Início
-                          </span>
-                          <span className="text-xl text-violet-100 font-mono">
-                            {formatOrbitalDate(selectedSat.StartTime)}
-                          </span>
-                        </div>
-
-                        <div className="bg-[#0a0718]/80 border border-violet-900/30 rounded-2xl p-6 flex flex-col justify-center">
-                          <span className="text-xs text-violet-500 uppercase tracking-widest font-mono flex items-center gap-2 mb-2">
-                            <Activity className="w-4 h-4" /> Fim das Operações
-                          </span>
-                          <span className="text-xl text-cyan-300 font-mono">
-                            {formatOrbitalDate(selectedSat.EndTime)}
-                          </span>
-                        </div>
-
-                        <div className="bg-[#0a0718]/80 border border-violet-900/30 rounded-2xl p-6 sm:col-span-2 flex items-center justify-between">
-                          <div>
-                            <span className="text-xs text-violet-500 uppercase tracking-widest font-mono block mb-1">
-                              Resolução do Fator Geocêntrico
-                            </span>
-                            <span className="text-lg text-white font-mono flex items-center gap-2">
-                              {selectedSat.Resolution} <span className="text-violet-500 text-sm">unidades</span>
-                            </span>
-                          </div>
-                          <Orbit className="w-10 h-10 text-violet-900/50" />
-                        </div>
-
-                      </div>
-
                     </div>
                   </motion.div>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-violet-800 font-mono border border-violet-900/20 rounded-2xl border-dashed">
-                    SELECIONE UMA SONDA NA FROTA PARA INICIAR RASTREIO
+                  <div className="h-full flex items-center justify-center text-muted-foreground font-mono uppercase tracking-widest text-xs border border-dashed border-white/10 rounded-2xl">
+                    Selecione uma sonda na frota para iniciar rastreio
                   </div>
                 )}
               </AnimatePresence>
-
             </div>
           </div>
         )}
       </div>
-    </div>
+    </ModuleScope>
   );
 }

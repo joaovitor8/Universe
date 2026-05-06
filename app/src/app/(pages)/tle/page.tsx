@@ -6,210 +6,227 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Binary, ChevronRight, Cpu, Terminal } from "lucide-react";
 import axios from "axios";
 
+import { getModule } from "@/src/lib/modules";
+import type { TleEntry } from "@/src/lib/types/nasa";
+import { ModuleScope, Scanline } from "@/src/components/hud";
 
-// Tipagem do TLE Set
-type TleData = {
-  satelliteId: number;
-  name: string;
-  date: string;
-  line1: string;
-  line2: string;
-};
+const MODULE = getModule("tle")!;
 
-
-const fetchTleData = async (query: string): Promise<TleData[]> => {
-  const res = await axios.get<TleData[]>(`/api/tle?q=${query}`);
+const fetchTle = async (query: string): Promise<TleEntry[]> => {
+  const res = await axios.get<TleEntry[]>(`/api/tle?q=${encodeURIComponent(query)}`);
   return res.data;
 };
 
+interface DecodedTle {
+  inclination: string;
+  raan: string;
+  eccentricity: string;
+  perigee: string;
+  meanAnomaly: string;
+  meanMotion: string;
+}
 
-// Um mini-parser TLE direto no Frontend
-// O formato TLE tem posições fixas de caracteres. A Linha 2 é a mais rica em parâmetros orbitais.
-const decodeTleLine2 = (line2: string) => {
+const decodeTleLine2 = (line2: string): DecodedTle | null => {
   if (!line2 || line2.length < 68) return null;
   return {
-    inclination: line2.substring(8, 16).trim(),    // Inclinação da órbita (graus)
-    raan: line2.substring(17, 25).trim(),          // Ascensão Reta do Nodo Ascendente
-    eccentricity: "0." + line2.substring(26, 33),  // Excentricidade (vem sem o "0." original)
-    perigee: line2.substring(34, 42).trim(),       // Argumento do Perigeu
-    meanAnomaly: line2.substring(43, 51).trim(),   // Anomalia Média
-    meanMotion: line2.substring(52, 63).trim(),    // Movimento Médio (órbitas por dia)
+    inclination: line2.substring(8, 16).trim(),
+    raan: line2.substring(17, 25).trim(),
+    eccentricity: "0." + line2.substring(26, 33),
+    perigee: line2.substring(34, 42).trim(),
+    meanAnomaly: line2.substring(43, 51).trim(),
+    meanMotion: line2.substring(52, 63).trim(),
   };
 };
 
-
 export default function TlePage() {
   const [searchInput, setSearchInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("25544"); // Começa rastreando a ISS
+  const [searchQuery, setSearchQuery] = useState("25544"); // ISS por padrão
 
-  const { data: tleSets, isLoading, error, isFetching } = useQuery({
+  const { data, isLoading, error, isFetching } = useQuery({
     queryKey: ["tle-data", searchQuery],
-    queryFn: () => fetchTleData(searchQuery),
+    queryFn: () => fetchTle(searchQuery),
   });
 
   const handleCommand = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchInput.trim()) {
       setSearchQuery(searchInput);
-      setSearchInput(""); // Limpa o terminal após enviar o comando
+      setSearchInput("");
     }
   };
 
+  const busy = isLoading || isFetching;
 
   return (
-    <div className="min-h-screen text-emerald-500 font-mono pt-12 pb-24 px-4 sm:px-8 relative selection:bg-emerald-500 selection:text-black">
-      
-      {/* Efeito visual retro de "Scanline" sobre toda a tela (Simulando monitor CRT) */}
-      <div className="absolute inset-0 pointer-events-none z-50 opacity-10 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,255,100,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-size-[100%_4px,3px_100%]" />
+    <ModuleScope theme={MODULE.theme} className="min-h-screen pt-12 pb-24 px-4 sm:px-8 relative">
+      {/* CRT scanlines globais */}
+      <Scanline className="!fixed inset-0 z-50 mix-blend-overlay opacity-50" intensity="subtle" />
 
-      <div className="max-w-5xl mx-auto w-full relative z-10 flex flex-col h-full min-h-[80vh]">
-        
-        {/* HEADER DO TERMINAL */}
-        <div className="flex justify-between items-end border-b-2 border-emerald-900 pb-4 mb-8">
+      <div
+        className="max-w-5xl mx-auto w-full relative z-10 flex flex-col min-h-[80vh] font-mono"
+        style={{ color: "var(--module-accent)" }}
+      >
+        {/* Header */}
+        <div
+          className="flex justify-between items-end pb-4 mb-8 border-b-2"
+          style={{ borderColor: "color-mix(in oklch, var(--module-accent) 40%, transparent)" }}
+        >
           <div>
-            <h1 className="text-2xl font-bold tracking-widest flex items-center gap-3">
-              <Terminal className="w-6 h-6" /> TLE_ORBITAL_DECODER
+            <h1 className="text-2xl font-bold tracking-[0.2em] flex items-center gap-3">
+              <Terminal className="w-6 h-6" />
+              TLE_ORBITAL_DECODER
             </h1>
-            <p className="text-emerald-700 text-xs mt-2 uppercase tracking-widest">
-              Conexão Segura Estabelecida // CelesTrak Interface
+            <p className="text-xs mt-2 uppercase tracking-[0.25em] opacity-60">
+              Codinome: {MODULE.codename} · CelesTrak Interface
             </p>
           </div>
           <div className="text-right hidden sm:block">
-            <span className="text-emerald-700 text-xs block mb-1">Status de Conexão</span>
+            <span className="text-xs block mb-1 opacity-60">STATUS</span>
             <span className="flex items-center gap-2 text-sm">
-              [ <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" /> ONLINE ]
+              [
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--module-accent)" }} />
+              ONLINE ]
             </span>
           </div>
         </div>
 
-        {/* ÁREA PRINCIPAL DO CONSOLE */}
-        <div className="grow flex flex-col gap-8">
-          
-          {/* Output History (Resultados) */}
-          <div className="grow flex flex-col gap-12">
-            
-            {error && (
-              <div className="bg-red-950/20 text-red-500 border border-red-900 p-6 shadow-[inset_0_0_20px_rgba(220,38,38,0.2)]">
-                &gt; ERRO_FATAL: {error.message}
-                <br />&gt; ABORTANDO_OPERAÇÃO.
-              </div>
-            )}
+        {/* Output */}
+        <div className="grow flex flex-col gap-10">
+          {error && (
+            <div
+              className="border p-6 text-destructive"
+              style={{
+                background: "oklch(0.65 0.22 25 / 0.05)",
+                borderColor: "oklch(0.65 0.22 25 / 0.5)",
+                boxShadow: "inset 0 0 24px oklch(0.65 0.22 25 / 0.2)",
+              }}
+            >
+              &gt; ERRO_FATAL: {error.message}
+              <br />&gt; ABORTANDO_OPERAÇÃO.
+            </div>
+          )}
 
-            {(isLoading || isFetching) && (
-              <div className="text-emerald-400/70 animate-pulse">
-                &gt; Inicializando varredura de radar para NORAD_ID / NOME: &quot;{searchQuery}&quot;...
-                <br />&gt; Interceptando pacotes orbitais... aguarde.
-              </div>
-            )}
+          {busy && (
+            <div className="opacity-70 animate-pulse">
+              &gt; Inicializando varredura para NORAD/NOME: &quot;{searchQuery}&quot;…
+              <br />&gt; Interceptando pacotes orbitais. Aguarde.
+            </div>
+          )}
 
-            <AnimatePresence>
-              {!isLoading && !isFetching && !error && tleSets?.map((tle, index) => {
-                const decoded = decodeTleLine2(tle.line2);
-                
-                return (
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    key={tle.satelliteId + index}
-                    className="flex flex-col gap-4 border border-emerald-900/50 p-6 bg-emerald-950/5 relative"
+          <AnimatePresence>
+            {!busy && !error && data?.map((tle, index) => {
+              const decoded = decodeTleLine2(tle.line2);
+
+              return (
+                <motion.div
+                  key={tle.satelliteId + ":" + index}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.08 }}
+                  className="flex flex-col gap-4 border p-6 relative"
+                  style={{
+                    borderColor: "color-mix(in oklch, var(--module-accent) 40%, transparent)",
+                    background: "var(--module-accent-soft)",
+                  }}
+                >
+                  <div
+                    className="flex justify-between items-start mb-2 border-b pb-4"
+                    style={{ borderColor: "color-mix(in oklch, var(--module-accent) 25%, transparent)" }}
                   >
-                    {/* Bloco de Nome e Data */}
-                    <div className="flex justify-between items-start mb-2 border-b border-emerald-900/50 pb-4">
-                      <div>
-                        <div className="text-xs text-emerald-700 uppercase mb-1">Identificação do Alvo</div>
-                        <div className="text-xl font-bold text-white tracking-wider">{tle.name}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs text-emerald-700 uppercase mb-1">Época TLE (Timestamp)</div>
-                        <div className="text-sm">{new Date(tle.date).toLocaleString('pt-BR')}</div>
-                      </div>
-                    </div>
-
-                    {/* BLOCO TLE CRU (Raw Data) */}
                     <div>
-                      <div className="text-xs text-emerald-700 uppercase mb-2 flex items-center gap-2">
-                        <Binary className="w-4 h-4" /> Two-Line Element Set Cru
-                      </div>
-                      <div className="bg-black border border-emerald-900 p-4 font-mono text-xs sm:text-sm text-emerald-400 overflow-x-auto whitespace-nowrap shadow-[inset_0_0_15px_rgba(16,185,129,0.1)]">
-                        <div>{tle.line1}</div>
-                        <div>{tle.line2}</div>
+                      <div className="text-xs uppercase opacity-60 mb-1">Identificação do Alvo</div>
+                      <div className="text-xl font-bold tracking-wider text-foreground">{tle.name}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs uppercase opacity-60 mb-1">Época TLE</div>
+                      <div className="text-sm">
+                        {new Date(tle.date).toLocaleString("pt-BR")}
                       </div>
                     </div>
+                  </div>
 
-                    {/* DECODER VISUAL (Parâmetros Extraídos) */}
-                    {decoded && (
-                      <div className="mt-4 pt-4 border-t border-emerald-900/50">
-                        <div className="text-xs text-emerald-700 uppercase mb-4 flex items-center gap-2">
-                          <Cpu className="w-4 h-4" /> Decodificação de Telemetria (Linha 2)
-                        </div>
-                        
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-4">
-                          <div>
-                            <span className="block text-[10px] text-emerald-600 mb-1">INCLINAÇÃO (GRAUS)</span>
-                            <span className="text-lg text-emerald-300">{decoded.inclination}°</span>
-                          </div>
-                          <div>
-                            <span className="block text-[10px] text-emerald-600 mb-1">EXCENTRICIDADE DA ÓRBITA</span>
-                            <span className="text-lg text-emerald-300">{decoded.eccentricity}</span>
-                          </div>
-                          <div>
-                            <span className="block text-[10px] text-emerald-600 mb-1">MOVIMENTO MÉDIO (VOLTAS/DIA)</span>
-                            <span className="text-lg text-emerald-300">{decoded.meanMotion}</span>
-                          </div>
-                          <div>
-                            <span className="block text-[10px] text-emerald-600 mb-1">ANOMALIA MÉDIA</span>
-                            <span className="text-lg text-emerald-300">{decoded.meanAnomaly}°</span>
-                          </div>
-                          <div>
-                            <span className="block text-[10px] text-emerald-600 mb-1">ARGUMENTO DO PERIGEU</span>
-                            <span className="text-lg text-emerald-300">{decoded.perigee}°</span>
-                          </div>
-                          <div className="hidden lg:block">
-                            <span className="block text-[10px] text-emerald-600 mb-1">ASCENSÃO RETA (RAAN)</span>
-                            <span className="text-lg text-emerald-300">{decoded.raan}°</span>
-                          </div>
-                        </div>
+                  <div>
+                    <div className="text-xs uppercase opacity-60 mb-2 flex items-center gap-2">
+                      <Binary className="w-4 h-4" /> Two-Line Element Set Cru
+                    </div>
+                    <div
+                      className="bg-black border p-4 font-mono text-xs sm:text-sm overflow-x-auto whitespace-nowrap"
+                      style={{
+                        borderColor: "color-mix(in oklch, var(--module-accent) 40%, transparent)",
+                        boxShadow: "inset 0 0 16px var(--module-accent-soft)",
+                      }}
+                    >
+                      <div>{tle.line1}</div>
+                      <div>{tle.line2}</div>
+                    </div>
+                  </div>
+
+                  {decoded && (
+                    <div
+                      className="mt-4 pt-4 border-t"
+                      style={{ borderColor: "color-mix(in oklch, var(--module-accent) 25%, transparent)" }}
+                    >
+                      <div className="text-xs uppercase opacity-60 mb-4 flex items-center gap-2">
+                        <Cpu className="w-4 h-4" /> Decodificação de Telemetria (Linha 2)
                       </div>
-                    )}
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-4">
+                        {([
+                          ["INCLINAÇÃO (°)", decoded.inclination + "°"],
+                          ["EXCENTRICIDADE", decoded.eccentricity],
+                          ["MOV. MÉDIO (V/D)", decoded.meanMotion],
+                          ["ANOMALIA MÉDIA", decoded.meanAnomaly + "°"],
+                          ["ARG. PERIGEU", decoded.perigee + "°"],
+                          ["RAAN", decoded.raan + "°"],
+                        ] as const).map(([label, value]) => (
+                          <div key={label}>
+                            <span className="block text-[10px] opacity-60 mb-1">{label}</span>
+                            <span className="text-lg">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
 
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-            
-            {!isLoading && !isFetching && tleSets && tleSets.length === 0 && (
-              <div className="text-emerald-700">
-                &gt; NENHUM_SATÉLITE_ENCONTRADO. Verifique o NORAD ID ou nome do alvo.
-              </div>
-            )}
-          </div>
-
+          {!busy && data && data.length === 0 && (
+            <div className="opacity-60">
+              &gt; NENHUM_SATÉLITE_ENCONTRADO. Verifique o NORAD ID ou nome do alvo.
+            </div>
+          )}
         </div>
 
-        {/* INPUT DE COMANDO (Fixado na base) */}
-        <div className="mt-12 bg-black border-t-2 border-emerald-900 pt-6">
+        {/* Input de comando */}
+        <div
+          className="mt-12 bg-black border-t-2 pt-6"
+          style={{ borderColor: "color-mix(in oklch, var(--module-accent) 40%, transparent)" }}
+        >
           <form onSubmit={handleCommand} className="flex flex-col gap-2">
-            <label className="text-xs text-emerald-700 uppercase tracking-widest flex items-center gap-2">
-              <ChevronRight className="w-4 h-4 text-emerald-500" />
-              Insira o NORAD ID (Ex: 25544, 20580) ou Nome do Satélite
+            <label className="text-xs uppercase tracking-[0.25em] flex items-center gap-2 opacity-70">
+              <ChevronRight className="w-4 h-4" />
+              Insira o NORAD ID (ex: 25544, 20580) ou nome do satélite
             </label>
-            <div className="flex items-center group bg-black border border-emerald-900 focus-within:border-emerald-500 transition-colors">
-              <span className="pl-4 pr-2 text-emerald-500">root@orbit-tracker:~#</span>
-              <input 
-                type="text" 
+            <div
+              className="flex items-center bg-black border focus-within:border-[var(--module-accent)] transition-colors"
+              style={{ borderColor: "color-mix(in oklch, var(--module-accent) 35%, transparent)" }}
+            >
+              <span className="pl-4 pr-2">root@orbit-tracker:~#</span>
+              <input
+                type="text"
                 autoFocus
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                disabled={isLoading || isFetching}
-                className="w-full bg-transparent text-emerald-400 p-3 outline-none disabled:opacity-50"
+                disabled={busy}
+                className="w-full bg-transparent p-3 outline-none disabled:opacity-50"
+                style={{ color: "var(--module-accent)" }}
                 placeholder="aguardando_input_do_usuario_"
               />
             </div>
           </form>
         </div>
-
       </div>
-    </div>
+    </ModuleScope>
   );
 }
