@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useMemo, useState } from "react";
@@ -154,6 +153,7 @@ export default function NewsPage() {
               >
                 <div className="grid md:grid-cols-2">
                   <div className="aspect-video md:aspect-auto bg-black overflow-hidden relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- Spaceflight News retorna URLs de domínios não controlados */}
                     <img
                       src={featured.image_url}
                       alt={featured.title}
@@ -205,6 +205,7 @@ export default function NewsPage() {
                   className="group flex gap-4 p-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-[var(--module-accent)]/40 transition-all"
                 >
                   <div className="w-32 h-24 shrink-0 rounded-lg overflow-hidden bg-black">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- Spaceflight News retorna URLs de domínios não controlados */}
                     <img
                       src={article.image_url}
                       alt={article.title}

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -195,6 +194,7 @@ export default function TrekPage() {
                   const url = buildTileUrl(config, z, tileY, tileX);
                   return (
                     <div key={`${target}-${z}-${tileX}-${tileY}-${i}`} className="bg-black/80 relative overflow-hidden border border-white/[0.02]">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- WMTS tiles mudam rápido com pan/zoom; otimização via /_next/image causaria thrash de cache */}
                       <img
                         src={url}
                         alt={`tile ${z}/${tileX}/${tileY}`}

@@ -4,13 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Orbit, Menu, X, Radar } from "lucide-react";
+import { ChevronDown, Orbit, Menu, X, Radar, Sparkles } from "lucide-react";
 
 import {
   CATEGORY_META,
   getModulesByCategory,
   type ModuleCategory,
 } from "@/src/lib/modules";
+import { SOLAR_BODIES } from "@/src/lib/solar-system";
 import { pickLocale, useLocale } from "@/src/lib/i18n";
 
 const CATEGORY_ORDER: ModuleCategory[] = [
@@ -30,6 +31,9 @@ export function Header() {
     pathname !== "/" &&
     pathname !== "/sobre" &&
     pathname !== "/mission-control";
+
+  const isCurrentRoute = (href: string) =>
+    pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
   return (
     <>
@@ -85,7 +89,7 @@ export function Header() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.97 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute top-14 left-1/2 -translate-x-1/2 w-[58rem] rounded-2xl shadow-2xl overflow-hidden p-7 border border-white/[0.08] bg-[#06060c]/95 backdrop-blur-2xl"
+                    className="absolute top-14 left-1/2 -translate-x-1/2 w-[64rem] rounded-2xl shadow-2xl overflow-hidden border border-white/[0.08] bg-[#06060c]/95 backdrop-blur-2xl"
                   >
                     {/* Brackets */}
                     <span className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-primary/60" />
@@ -93,7 +97,8 @@ export function Header() {
                     <span className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-primary/60" />
                     <span className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-primary/60" />
 
-                    <div className="grid grid-cols-4 gap-6">
+                    {/* Top: 4 categorias */}
+                    <div className="grid grid-cols-4 gap-6 p-7 pb-6">
                       {CATEGORY_ORDER.map((catId) => {
                         const meta = CATEGORY_META[catId];
                         const modules = getModulesByCategory(catId);
@@ -106,7 +111,7 @@ export function Header() {
                             </div>
                             {modules.map((mod) => {
                               const isActive = mod.status === "active";
-                              const isCurrent = pathname === mod.href;
+                              const isCurrent = isCurrentRoute(mod.href);
                               const title = pickLocale(mod.title, mod.titleEn, locale);
                               return (
                                 <Link
@@ -116,19 +121,41 @@ export function Header() {
                                     if (!isActive) e.preventDefault();
                                     setMegaOpen(false);
                                   }}
-                                  className={`group flex items-center justify-between gap-2 text-sm transition-colors ${
+                                  className={`group flex items-center justify-between gap-2 text-sm transition-all rounded-md -mx-1 px-1 py-0.5 ${
                                     isCurrent
-                                      ? "text-primary font-bold"
+                                      ? "font-bold"
                                       : isActive
                                       ? "text-muted-foreground hover:text-foreground"
                                       : "text-muted-foreground/30 cursor-not-allowed"
                                   }`}
+                                  style={
+                                    isCurrent
+                                      ? {
+                                          color: mod.theme.accent,
+                                          background: mod.theme.accentSoft,
+                                        }
+                                      : undefined
+                                  }
                                   aria-disabled={!isActive}
+                                  aria-current={isCurrent ? "page" : undefined}
                                 >
                                   <span className="flex items-center gap-2">
-                                    {isActive && (
+                                    {isActive && !isCurrent && (
                                       <span
-                                        className="w-1 h-1 rounded-full bg-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_6px_oklch(0.78_0.18_145)]"
+                                        className="w-1 h-1 rounded-full opacity-0 group-hover:opacity-80 transition-opacity"
+                                        style={{
+                                          background: mod.theme.accent,
+                                          boxShadow: `0 0 6px ${mod.theme.accent}`,
+                                        }}
+                                      />
+                                    )}
+                                    {isCurrent && (
+                                      <span
+                                        className="w-1 h-1 rounded-full"
+                                        style={{
+                                          background: mod.theme.accent,
+                                          boxShadow: `0 0 8px ${mod.theme.accent}`,
+                                        }}
                                       />
                                     )}
                                     {title}
@@ -148,6 +175,66 @@ export function Header() {
                           </div>
                         );
                       })}
+                    </div>
+
+                    {/* Bottom: faixa de Sistema Solar + Subsystems */}
+                    <div className="border-t border-white/[0.06] bg-white/[0.015] px-7 py-4 grid grid-cols-12 gap-6">
+                      <div className="col-span-9">
+                        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.25em] mb-2.5" style={{ color: "oklch(0.78 0.16 80)" }}>
+                          <Sparkles className="w-3 h-3" /> {t("nav.bodies")}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {SOLAR_BODIES.map((body) => {
+                            const href = `/solar-system/${body.id}`;
+                            const isCurrent = pathname === href;
+                            return (
+                              <Link
+                                key={body.id}
+                                href={href}
+                                onClick={() => setMegaOpen(false)}
+                                className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.18em] border transition-all hover:scale-105"
+                                style={{
+                                  borderColor: isCurrent
+                                    ? body.accent
+                                    : "rgba(255,255,255,0.08)",
+                                  background: isCurrent
+                                    ? `color-mix(in oklch, ${body.accent} 18%, transparent)`
+                                    : "transparent",
+                                  color: isCurrent ? body.accent : "var(--muted-foreground)",
+                                }}
+                                aria-current={isCurrent ? "page" : undefined}
+                              >
+                                <span
+                                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                                  style={{
+                                    background: body.accent,
+                                    boxShadow: `0 0 6px ${body.accent.replace(")", " / 0.6)")}`,
+                                  }}
+                                />
+                                {locale === "en" ? body.en : body.pt}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="col-span-3 flex flex-col gap-2 border-l border-white/[0.06] pl-6">
+                        <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-1">
+                          {t("nav.subsystems")}
+                        </div>
+                        <SubsystemLink
+                          href="/mission-control"
+                          label={t("nav.missionControl")}
+                          active={pathname === "/mission-control"}
+                          onClick={() => setMegaOpen(false)}
+                        />
+                        <SubsystemLink
+                          href="/sobre"
+                          label={t("nav.about")}
+                          active={pathname === "/sobre"}
+                          onClick={() => setMegaOpen(false)}
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -204,7 +291,7 @@ export function Header() {
                     <div className="flex flex-col gap-3 pl-2">
                       {modules.map((mod) => {
                         const isActive = mod.status === "active";
-                        const isCurrent = pathname === mod.href;
+                        const isCurrent = isCurrentRoute(mod.href);
                         const title = pickLocale(mod.title, mod.titleEn, locale);
                         return (
                           <Link
@@ -214,15 +301,16 @@ export function Header() {
                               if (!isActive) e.preventDefault();
                               setMobileOpen(false);
                             }}
-                            className={`flex items-center justify-between text-base transition-colors ${
+                            className="flex items-center justify-between text-base transition-colors"
+                            style={
                               isCurrent
-                                ? "text-primary font-bold"
-                                : isActive
-                                ? "text-muted-foreground"
-                                : "text-muted-foreground/30"
-                            }`}
+                                ? { color: mod.theme.accent, fontWeight: 700 }
+                                : undefined
+                            }
                           >
-                            <span>{title}</span>
+                            <span className={isCurrent ? "" : isActive ? "text-muted-foreground" : "text-muted-foreground/30"}>
+                              {title}
+                            </span>
                             {!isActive && (
                               <span className="text-[9px] font-mono tracking-widest uppercase border border-muted-foreground/20 rounded px-1.5 py-0.5">
                                 {t("nav.soon")}
@@ -235,6 +323,37 @@ export function Header() {
                   </div>
                 );
               })}
+
+              {/* Sistema Solar mobile */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-[0.25em] border-b border-white/10 pb-2" style={{ color: "oklch(0.78 0.16 80)" }}>
+                  <Sparkles className="w-4 h-4" /> {t("nav.bodies")}
+                </div>
+                <div className="grid grid-cols-2 gap-2 pl-2">
+                  {SOLAR_BODIES.map((body) => {
+                    const href = `/solar-system/${body.id}`;
+                    return (
+                      <Link
+                        key={body.id}
+                        href={href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-2 text-sm py-1"
+                      >
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{
+                            background: body.accent,
+                            boxShadow: `0 0 6px ${body.accent.replace(")", " / 0.6)")}`,
+                          }}
+                        />
+                        <span style={{ color: pathname === href ? body.accent : undefined }}>
+                          {locale === "en" ? body.en : body.pt}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
@@ -266,6 +385,28 @@ function NavLink({ href, active, children }: NavLinkProps) {
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
         />
       )}
+    </Link>
+  );
+}
+
+interface SubsystemLinkProps {
+  href: string;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}
+
+function SubsystemLink({ href, label, active, onClick }: SubsystemLinkProps) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`flex items-center justify-between text-sm transition-colors py-1 ${
+        active ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <span>{label}</span>
+      <span className="text-[9px] font-mono opacity-40">→</span>
     </Link>
   );
 }

@@ -32,6 +32,10 @@ export const dict = {
   "nav.missionControl": { pt: "Mission Control", en: "Mission Control" },
   "nav.menu": { pt: "Alternar menu", en: "Toggle menu" },
   "nav.soon": { pt: "Soon", en: "Soon" },
+  "nav.subsystems": { pt: "Subsistemas", en: "Subsystems" },
+  "nav.bodies": { pt: "Corpos Celestes", en: "Celestial Bodies" },
+  "nav.search": { pt: "Filtrar módulos…", en: "Filter modules…" },
+  "nav.results": { pt: "resultados", en: "results" },
 
   /* Status Bar */
   "status.nominal": { pt: "All Systems Nominal", en: "All Systems Nominal" },
@@ -53,6 +57,27 @@ export const dict = {
     en: "Unified console for telemetry, planetary defense, and space archives. From the ancient dust of Mars to the light of distant galaxies — all decoded and at your fingertips.",
   },
   "home.cta": { pt: "Iniciar Exploração", en: "Begin Exploration" },
+  "home.cta.secondary": { pt: "Explorar Catálogo", en: "Browse Catalog" },
+
+  /* Home — Live preview */
+  "home.live.label": { pt: "Sinal ao Vivo", en: "Live Signal" },
+  "home.live.apodTitle": { pt: "Imagem do Dia", en: "Image of the Day" },
+  "home.live.apodCta": { pt: "Abrir registro completo", en: "Open full record" },
+  "home.live.apodFailure": { pt: "Sinal APOD indisponível", en: "APOD signal unavailable" },
+  "home.live.openMc": { pt: "Painel agregado completo", en: "Full aggregated panel" },
+  "home.live.nextLaunch": { pt: "Próximo Lançamento", en: "Next Launch" },
+  "home.live.nextLaunchEmpty": { pt: "Sem janelas confirmadas", en: "No confirmed windows" },
+  "home.live.lastFlare": { pt: "Última Erupção", en: "Latest Flare" },
+  "home.live.lastFlareEmpty": { pt: "Sol em silêncio nos últimos 7 dias", en: "Quiet Sun for the past 7 days" },
+  "home.live.signalLost": { pt: "Sinal perdido", en: "Signal lost" },
+
+  /* Home — Solar strip */
+  "home.solar.label": { pt: "Sistema Solar", en: "Solar System" },
+  "home.solar.subtitle": { pt: "10 corpos catalogados — clique para o dossiê físico.", en: "10 bodies cataloged — click for the physical dossier." },
+  "home.solar.openMap": { pt: "Mapa orbital completo", en: "Full orbital map" },
+
+  /* Home — Filter */
+  "home.filter.all": { pt: "Todos", en: "All" },
 
   /* Home — Stats */
   "home.stats.modules": { pt: "Módulos Online", en: "Modules Online" },
@@ -62,6 +87,8 @@ export const dict = {
   "home.stats.uptime": { pt: "uptime", en: "uptime" },
   "home.stats.channels": { pt: "channels", en: "channels" },
   "home.stats.nominal": { pt: "NOMINAL", en: "NOMINAL" },
+  "home.stats.bodies": { pt: "Corpos Celestes", en: "Celestial Bodies" },
+  "home.stats.routes": { pt: "Rotas Estáticas", en: "Static Routes" },
 
   /* Home — Catálogo */
   "home.catalog.label": { pt: "Catálogo Operacional", en: "Operational Catalog" },
@@ -90,6 +117,17 @@ export const dict = {
     pt: "Construído com Next.js · React Three Fiber · Tailwind v4",
     en: "Built with Next.js · React Three Fiber · Tailwind v4",
   },
+  "footer.subsystems": { pt: "Subsistemas", en: "Subsystems" },
+  "footer.dataSources": { pt: "Fontes de Dados", en: "Data Sources" },
+  "footer.techStack": { pt: "Stack", en: "Stack" },
+  "footer.bodies": { pt: "Corpos", en: "Bodies" },
+  "footer.routes": { pt: "Rotas", en: "Routes" },
+  "footer.sitemap": { pt: "Mapa do Site", en: "Sitemap" },
+  "footer.offline": { pt: "Página Offline", en: "Offline Page" },
+  "footer.legalNote": {
+    pt: "Projeto educacional. Todos os dados pertencem às respectivas agências.",
+    en: "Educational project. All data belongs to the respective agencies.",
+  },
 
   /* Sobre */
   "about.codename": { pt: "MANIFESTO-01", en: "MANIFESTO-01" },
@@ -117,7 +155,20 @@ export const dict = {
   "about.timeline.w4.body": { pt: "React Three Fiber, sistema orbital de exoplanetas e simulador de buraco negro.", en: "React Three Fiber, exoplanet orbital system, and black hole simulator." },
   "about.timeline.w5.title": { pt: "Onda 5 · Polimento & i18n", en: "Wave 5 · Polish & i18n" },
   "about.timeline.w5.body": { pt: "Toggle PT/EN, página Sobre e Mission Control agregado.", en: "PT/EN toggle, About page, and aggregated Mission Control." },
+  "about.timeline.w6.title": { pt: "Onda 6 · Ativação Total", en: "Wave 6 · Full Activation" },
+  "about.timeline.w6.body": { pt: "Mars InSight, EONET, GIBS, TechTransfer, OSDR e Trek WMTS — 19/19 módulos online.", en: "Mars InSight, EONET, GIBS, TechTransfer, OSDR, and Trek WMTS — 19/19 modules online." },
+  "about.timeline.w7.title": { pt: "Onda 7 · SEO & Performance", en: "Wave 7 · SEO & Performance" },
+  "about.timeline.w7.body": { pt: "Metadata por rota, sitemap.xml, robots.ts, Open Graph, next/image em hero shots.", en: "Per-route metadata, sitemap.xml, robots.ts, Open Graph, next/image on hero shots." },
+  "about.timeline.w8.title": { pt: "Onda 8 · PWA & Offline", en: "Wave 8 · PWA & Offline" },
+  "about.timeline.w8.body": { pt: "Manifest, ícones SVG, service worker custom, página offline e install prompt.", en: "Manifest, SVG icons, custom service worker, offline page, and install prompt." },
+  "about.timeline.w9.title": { pt: "Onda 9 · Sistema Solar & Polish", en: "Wave 9 · Solar System & Polish" },
+  "about.timeline.w9.body": { pt: "Mapa orbital de 10 corpos via Wikipedia API, Header/Footer/Home reestruturados, limpeza de deps.", en: "Orbital map of 10 bodies via Wikipedia API, Header/Footer/Home restructured, dep cleanup." },
   "about.author": { pt: "Construído por", en: "Built by" },
+  "about.version": { pt: "Versão atual", en: "Current build" },
+  "about.stats.modules": { pt: "Módulos", en: "Modules" },
+  "about.stats.bodies": { pt: "Corpos", en: "Bodies" },
+  "about.stats.routes": { pt: "Rotas", en: "Routes" },
+  "about.stats.sources": { pt: "Fontes", en: "Sources" },
 
   /* Mission Control */
   "mc.codename": { pt: "MISSION-CONTROL", en: "MISSION-CONTROL" },
