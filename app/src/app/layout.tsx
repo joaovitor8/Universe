@@ -7,6 +7,7 @@ import { Footer } from "@/src/components/Footer";
 import { SystemStatusBar } from "@/src/components/SystemStatusBar";
 import Stars from "../components/Stars";
 import { Providers } from "@/src/components/Providers";
+import { SITE_URL } from "@/src/lib/config";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,8 +23,6 @@ const mono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
 });
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://universo.local";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

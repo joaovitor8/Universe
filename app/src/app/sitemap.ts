@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
 
+import { SITE_URL } from "@/src/lib/config";
 import { ENABLED_MODULES } from "@/src/lib/modules";
 import { SOLAR_BODIES } from "@/src/lib/solar-system";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://universo.local";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
