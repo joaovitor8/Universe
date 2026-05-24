@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-
 // Configurações das camadas WMTS oficiais dos portais NASA Trek
 const TREK_LAYERS = {
   moon: {
@@ -23,24 +22,15 @@ const TREK_LAYERS = {
     layer: "Dawn_Vesta_HAMO_Mosaic_Global_DLR_60m",
     format: "jpg",
     maxZoom: 4,
-  }
-};
+  },
+} as const;
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const target = searchParams.get("target") as keyof typeof TREK_LAYERS || "moon";
+  const target =
+    (new URL(request.url).searchParams.get(
+      "target",
+    ) as keyof typeof TREK_LAYERS) || "moon";
 
-  try {
-    const config = TREK_LAYERS[target] || TREK_LAYERS.moon;
-    
-    // Devolvemos a configuração para que o frontend construa a grelha de "tiles"
-    return NextResponse.json(config);
-    
-  } catch (error) {
-    console.error("Erro na API Trek:", error);
-    return NextResponse.json(
-      { error: "Falha ao calibrar os servidores cartográficos." },
-      { status: 500 }
-    );
-  }
+  const config = TREK_LAYERS[target] ?? TREK_LAYERS.moon;
+  return NextResponse.json(config);
 }

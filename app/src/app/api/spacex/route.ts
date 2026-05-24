@@ -1,56 +1,63 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
 import type {
   SpacexLaunch,
   SpacexLaunchpad,
   SpacexRocket,
   SpacexSnapshot,
 } from "@/src/lib/types/spacex";
-import type { ApiError } from "@/src/lib/types/nasa";
+import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
 const BASE = "https://api.spacexdata.com/v4";
 
 export const revalidate = 1800; // 30min — manifest de lançamentos muda raramente
 
 export async function GET() {
-  try {
-    const [next, latest, upcoming, recent, rockets, launchpads] =
-      await Promise.all([
-        axios.get<SpacexLaunch>(`${BASE}/launches/next`).then((r) => r.data).catch(() => null),
-        axios.get<SpacexLaunch>(`${BASE}/launches/latest`).then((r) => r.data).catch(() => null),
-        axios
-          .post<{ docs: SpacexLaunch[] }>(`${BASE}/launches/query`, {
-            query: { upcoming: true },
-            options: { sort: { date_unix: "asc" }, limit: 6 },
+  return handleRoute(
+    {
+      tag: "SPACEX",
+      fallbackMessage:
+        "Falha ao estabelecer downlink com Hawthorne. Tente novamente.",
+    },
+    async () => {
+      // Tolerância individual: cada call pode falhar sem derrubar o snapshot
+      const [next, latest, upcoming, recent, rockets, launchpads] =
+        await Promise.all([
+          fetchUpstream<SpacexLaunch>(`${BASE}/launches/next`).catch(() => null),
+          fetchUpstream<SpacexLaunch>(`${BASE}/launches/latest`).catch(() => null),
+          fetchUpstream<{ docs: SpacexLaunch[] }>(`${BASE}/launches/query`, {
+            method: "POST",
+            data: {
+              query: { upcoming: true },
+              options: { sort: { date_unix: "asc" }, limit: 6 },
+            },
           })
-          .then((r) => r.data.docs)
-          .catch(() => [] as SpacexLaunch[]),
-        axios
-          .post<{ docs: SpacexLaunch[] }>(`${BASE}/launches/query`, {
-            query: { upcoming: false },
-            options: { sort: { date_unix: "desc" }, limit: 6 },
+            .then((r) => r.docs)
+            .catch(() => [] as SpacexLaunch[]),
+          fetchUpstream<{ docs: SpacexLaunch[] }>(`${BASE}/launches/query`, {
+            method: "POST",
+            data: {
+              query: { upcoming: false },
+              options: { sort: { date_unix: "desc" }, limit: 6 },
+            },
           })
-          .then((r) => r.data.docs)
-          .catch(() => [] as SpacexLaunch[]),
-        axios.get<SpacexRocket[]>(`${BASE}/rockets`).then((r) => r.data).catch(() => [] as SpacexRocket[]),
-        axios.get<SpacexLaunchpad[]>(`${BASE}/launchpads`).then((r) => r.data).catch(() => [] as SpacexLaunchpad[]),
-      ]);
+            .then((r) => r.docs)
+            .catch(() => [] as SpacexLaunch[]),
+          fetchUpstream<SpacexRocket[]>(`${BASE}/rockets`).catch(
+            () => [] as SpacexRocket[],
+          ),
+          fetchUpstream<SpacexLaunchpad[]>(`${BASE}/launchpads`).catch(
+            () => [] as SpacexLaunchpad[],
+          ),
+        ]);
 
-    const snapshot: SpacexSnapshot = {
-      next,
-      latest,
-      upcoming,
-      recent,
-      rockets,
-      launchpads,
-    };
-
-    return NextResponse.json<SpacexSnapshot>(snapshot);
-  } catch (error) {
-    console.error("Erro na API SpaceX:", error);
-    return NextResponse.json<ApiError>(
-      { error: "Falha ao estabelecer downlink com Hawthorne. Tente novamente." },
-      { status: 500 },
-    );
-  }
+      const snapshot: SpacexSnapshot = {
+        next,
+        latest,
+        upcoming,
+        recent,
+        rockets,
+        launchpads,
+      };
+      return snapshot;
+    },
+  );
 }

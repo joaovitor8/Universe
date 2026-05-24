@@ -1,31 +1,35 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
+import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
+export const revalidate = 86400; // 24h — patentes/spin-offs mudam lentamente
+
+interface TechTransferResponse {
+  results?: unknown[];
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const type = searchParams.get("type") || "software"; // Pode ser: patent, software, spinoff
+  const type = searchParams.get("type") || "software"; // patent | software | spinoff
   const query = searchParams.get("q") || "";
-  const apiKey = process.env.KEY_NASA;
 
-  try {
-    // A API do TechTransfer aceita a query string diretamente na URL antes da chave
-    const url = query 
-      ? `https://api.nasa.gov/techtransfer/${type}/?${query}&api_key=${apiKey}`
-      : `https://api.nasa.gov/techtransfer/${type}/?api_key=${apiKey}`;
+  return handleRoute(
+    {
+      tag: "TECHTRANSFER",
+      fallbackMessage: "Falha de conexão com o banco de patentes da agência.",
+      messages: {
+        429: "Cota de telemetria estourada. Aguarde alguns minutos.",
+      },
+    },
+    async () => {
+      // A API espera os filtros como query string crua antes do api_key.
+      const path = query
+        ? `https://api.nasa.gov/techtransfer/${type}/?${query}`
+        : `https://api.nasa.gov/techtransfer/${type}/`;
 
-    const response = await axios.get(url);
+      const data = await fetchUpstream<TechTransferResponse>(path, {
+        nasaAuth: true,
+      });
 
-    // Os dados vêm dentro da propriedade "results" como um array de arrays
-    const results = response.data.results || [];
-
-    // Limitamos a 24 resultados (um bom número para grids de 2, 3 ou 4 colunas)
-    return NextResponse.json(results.slice(0, 24));
-  } catch (error) {
-    console.error("Erro na API TechTransfer:", error);
-    return NextResponse.json(
-      { error: "Falha de conexão com o banco de patentes da agência." },
-      { status: 500 }
-    );
-  }
+      return (data.results ?? []).slice(0, 24);
+    },
+  );
 }

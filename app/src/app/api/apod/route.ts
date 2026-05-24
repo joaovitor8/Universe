@@ -1,31 +1,25 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
-import type { ApodData, ApiError } from "@/src/lib/types/nasa";
+import type { ApodData } from "@/src/lib/types/nasa";
+import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
 export const revalidate = 1800; // 30 min — APOD muda 1x ao dia
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date");
-  const apiKey = process.env.KEY_NASA;
+  const date = new URL(request.url).searchParams.get("date");
 
-  try {
-    const response = await axios.get<ApodData>(
-      "https://api.nasa.gov/planetary/apod",
-      {
-        params: {
-          api_key: apiKey,
-          ...(date && { date }),
-        },
+  return handleRoute(
+    {
+      tag: "APOD",
+      fallbackMessage:
+        "Não foi possível acessar os arquivos estelares neste momento.",
+      messages: {
+        404: "Sem registro cósmico para a data selecionada.",
+        429: "Cota de telemetria estourada. Aguarde alguns minutos.",
       },
-    );
-
-    return NextResponse.json<ApodData>(response.data);
-  } catch (error) {
-    console.error("Erro na API APOD:", error);
-    return NextResponse.json<ApiError>(
-      { error: "Não foi possível acessar os arquivos estelares neste momento." },
-      { status: 500 },
-    );
-  }
+    },
+    () =>
+      fetchUpstream<ApodData>("https://api.nasa.gov/planetary/apod", {
+        nasaAuth: true,
+        params: date ? { date } : undefined,
+      }),
+  );
 }

@@ -1,33 +1,31 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
-import type { ApiError, SolarFlare } from "@/src/lib/types/nasa";
+import type { SolarFlare } from "@/src/lib/types/nasa";
+import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
 export const revalidate = 1800; // 30min — DONKI atualiza ao longo do dia
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const startDate = searchParams.get("startDate");
-  const endDate = searchParams.get("endDate");
-  const apiKey = process.env.KEY_NASA;
+  const startDate = searchParams.get("startDate") ?? undefined;
+  const endDate = searchParams.get("endDate") ?? undefined;
 
-  try {
-    const response = await axios.get<SolarFlare[]>(
-      "https://api.nasa.gov/DONKI/FLR",
-      {
-        params: {
-          startDate: startDate || undefined,
-          endDate: endDate || undefined,
-          api_key: apiKey,
-        },
+  return handleRoute(
+    {
+      tag: "DONKI",
+      fallbackMessage:
+        "Interferência eletromagnética. Falha ao obter dados solares.",
+      messages: {
+        429: "Cota de telemetria estourada. Aguarde alguns minutos.",
       },
-    );
-
-    return NextResponse.json<SolarFlare[]>(response.data ?? []);
-  } catch (error) {
-    console.error("Erro na API DONKI:", error);
-    return NextResponse.json<ApiError>(
-      { error: "Interferência eletromagnética. Falha ao obter dados solares." },
-      { status: 500 },
-    );
-  }
+    },
+    async () => {
+      const data = await fetchUpstream<SolarFlare[]>(
+        "https://api.nasa.gov/DONKI/FLR",
+        {
+          nasaAuth: true,
+          params: { startDate, endDate },
+        },
+      );
+      return data ?? [];
+    },
+  );
 }

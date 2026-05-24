@@ -1,26 +1,26 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
+import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
+export const revalidate = 1800; // 30min — eventos atualizam ao longo do dia
+
+interface EonetResponse {
+  events?: unknown[];
+}
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const days = searchParams.get("days") || "30";
+  const days = new URL(request.url).searchParams.get("days") || "30";
 
-  try {
-    const response = await axios.get("https://eonet.gsfc.nasa.gov/api/v3/events", {
-      params: {
-        days: days,
-        status: "open",
-      },
-    });
-
-    return NextResponse.json(response.data.events || []);
-    
-  } catch (error) {
-    console.error("Erro na API EONET:", error);
-    return NextResponse.json(
-      { error: "Perda de sinal com a rede de satélites de observação da Terra." },
-      { status: 500 }
-    );
-  }
+  return handleRoute(
+    {
+      tag: "EONET",
+      fallbackMessage:
+        "Perda de sinal com a rede de satélites de observação da Terra.",
+    },
+    async () => {
+      const data = await fetchUpstream<EonetResponse>(
+        "https://eonet.gsfc.nasa.gov/api/v3/events",
+        { params: { days, status: "open" } },
+      );
+      return data.events ?? [];
+    },
+  );
 }

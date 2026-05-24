@@ -1,27 +1,26 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
+import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
+export const revalidate = 3600; // 1h — busca elastic, vale cachear
+
+interface OsdrResponse {
+  hits?: { hits?: unknown[] };
+}
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  // Se não houver busca, o padrão será "spaceflight" (voo espacial) para trazer experimentos reais da ISS
-  const term = searchParams.get("q") || "spaceflight";
+  const term = new URL(request.url).searchParams.get("q") || "spaceflight";
 
-  try {
-    // A API do OSDR usa um endpoint de busca (geode-py)
-    const url = `https://osdr.nasa.gov/osdr/data/search?term=${encodeURIComponent(term)}`;
-
-    const response = await axios.get(url);
-
-    // O ElasticSearch devolve os dados dentro de hits.hits
-    const studies = response.data.hits?.hits || [];
-
-    return NextResponse.json(studies);
-  } catch (error) {
-    console.error("Erro na API OSDR:", error);
-    return NextResponse.json(
-      { error: "Falha na decodificação da sequência de dados biológicos." },
-      { status: 500 }
-    );
-  }
+  return handleRoute(
+    {
+      tag: "OSDR",
+      fallbackMessage:
+        "Falha na decodificação da sequência de dados biológicos.",
+    },
+    async () => {
+      // A API do OSDR usa um endpoint de busca (geode-py)
+      const url = `https://osdr.nasa.gov/osdr/data/search?term=${encodeURIComponent(term)}`;
+      const data = await fetchUpstream<OsdrResponse>(url);
+      // O ElasticSearch devolve os dados dentro de hits.hits
+      return data.hits?.hits ?? [];
+    },
+  );
 }

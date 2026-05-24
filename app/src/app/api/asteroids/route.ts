@@ -1,39 +1,28 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
-import type { NeoFeedResponse, ApiError } from "@/src/lib/types/nasa";
+import type { NeoFeedResponse } from "@/src/lib/types/nasa";
+import { badRequest, fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
 export const revalidate = 3600; // 1h — feed NeoWs por dia
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date");
-  const apiKey = process.env.KEY_NASA;
+  const date = new URL(request.url).searchParams.get("date");
+  if (!date) return badRequest("É necessário fornecer uma data de rastreio.");
 
-  if (!date) {
-    return NextResponse.json<ApiError>(
-      { error: "É necessário fornecer uma data de rastreio." },
-      { status: 400 },
-    );
-  }
-
-  try {
-    const response = await axios.get<NeoFeedResponse>(
-      "https://api.nasa.gov/neo/rest/v1/feed",
-      {
-        params: {
-          start_date: date,
-          end_date: date,
-          api_key: apiKey,
-        },
+  return handleRoute(
+    {
+      tag: "NEOWS",
+      fallbackMessage: "Falha na comunicação com o radar orbital.",
+      messages: {
+        400: "Data inválida para o radar orbital.",
+        429: "Cota de telemetria estourada. Aguarde alguns minutos.",
       },
-    );
-
-    return NextResponse.json<NeoFeedResponse>(response.data);
-  } catch (error) {
-    console.error("Erro na API NeoWs:", error);
-    return NextResponse.json<ApiError>(
-      { error: "Falha na comunicação com o radar orbital." },
-      { status: 500 },
-    );
-  }
+    },
+    () =>
+      fetchUpstream<NeoFeedResponse>(
+        "https://api.nasa.gov/neo/rest/v1/feed",
+        {
+          nasaAuth: true,
+          params: { start_date: date, end_date: date },
+        },
+      ),
+  );
 }

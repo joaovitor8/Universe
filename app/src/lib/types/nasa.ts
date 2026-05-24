@@ -184,4 +184,6 @@ export interface TechPortProject {
 /* ─── Erro padrão das rotas BFF ───────────────────────────────── */
 export interface ApiError {
   error: string;
+  /** Status HTTP do upstream (preservado quando aplicável: 404, 429, 403, ...) */
+  code?: number;
 }
