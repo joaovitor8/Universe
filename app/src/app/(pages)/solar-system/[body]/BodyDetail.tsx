@@ -22,6 +22,7 @@ import axios from "axios";
 
 import { useLocale } from "@/src/lib/i18n";
 import { BODY_TYPE_LABEL, type SolarBody } from "@/src/lib/solar-system";
+import { withAlpha } from "@/src/lib/utils";
 import {
   CommsFailure,
   HudPanel,
@@ -88,14 +89,14 @@ interface StatProps {
 function Stat({ label, value, icon, accent }: StatProps) {
   return (
     <div
-      className="rounded-xl border bg-white/[0.02] p-4 flex flex-col gap-2"
+      className="rounded-xl border bg-white/2 p-4 flex flex-col gap-2"
       style={{ borderColor: "rgba(255,255,255,0.06)" }}
     >
       <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground/70">
         <span style={{ color: accent }}>{icon}</span>
         {label}
       </div>
-      <div className="font-mono text-base md:text-lg font-bold tabular-nums break-words" style={{ color: accent }}>
+      <div className="font-mono text-base md:text-lg font-bold tabular-nums wrap-break-word" style={{ color: accent }}>
         {value}
       </div>
     </div>
@@ -115,8 +116,8 @@ export function BodyDetail({ body }: { body: SolarBody }) {
 
   const bodyTheme = {
     accent: body.accent,
-    accentSoft: body.accent.replace(")", " / 0.15)"),
-    glow: `0 0 32px ${body.accent.replace(")", " / 0.35)")}`,
+    accentSoft: withAlpha(body.accent, 0.15),
+    glow: `0 0 32px ${withAlpha(body.accent, 0.35)}`,
   };
 
   const typeLabel = BODY_TYPE_LABEL[body.type];
@@ -145,7 +146,7 @@ export function BodyDetail({ body }: { body: SolarBody }) {
               className="w-16 h-16 rounded-full shrink-0 relative"
               style={{
                 background: body.accent,
-                boxShadow: `0 0 40px ${body.accent.replace(")", " / 0.6)")}`,
+                boxShadow: `0 0 40px ${withAlpha(body.accent, 0.6)}`,
               }}
             >
               {body.hasRings && (
@@ -226,7 +227,7 @@ export function BodyDetail({ body }: { body: SolarBody }) {
                 className="w-32 h-32 rounded-full"
                 style={{
                   background: body.accent,
-                  boxShadow: `0 0 80px ${body.accent.replace(")", " / 0.7)")}`,
+                  boxShadow: `0 0 80px ${withAlpha(body.accent, 0.7)}`,
                 }}
               />
             )}

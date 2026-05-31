@@ -1,10 +1,15 @@
 import type { EpicImage } from "@/src/lib/types/nasa";
-import { fetchUpstream, handleRoute } from "@/src/lib/upstream";
+import { badRequest, fetchUpstream, handleRoute } from "@/src/lib/upstream";
 
 export const revalidate = 3600; // 1h
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
 export async function GET(request: Request) {
   const date = new URL(request.url).searchParams.get("date");
+  if (date && !ISO_DATE.test(date)) {
+    return badRequest("Data inválida. Use o formato YYYY-MM-DD.");
+  }
   const url = date
     ? `https://api.nasa.gov/EPIC/api/natural/date/${date}`
     : "https://api.nasa.gov/EPIC/api/natural";

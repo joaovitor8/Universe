@@ -1,4 +1,5 @@
 import {
+  Atom,
   Briefcase,
   Camera,
   Cpu,
@@ -21,6 +22,8 @@ import {
   ThermometerSun,
   type LucideIcon,
 } from "lucide-react";
+
+import { withAlpha } from "./utils";
 
 export type ModuleStatus = "active" | "planned";
 export type ModuleSize = "sm" | "lg";
@@ -51,12 +54,14 @@ export interface SpaceModule {
   status: ModuleStatus;
   size: ModuleSize;
   theme: ModuleTheme;
+  /** Quando true, `href` aponta para um deploy externo (abre em nova aba). */
+  external?: boolean;
 }
 
 const theme = (accent: string): ModuleTheme => ({
   accent,
-  accentSoft: accent.replace(")", " / 0.15)"),
-  glow: `0 0 32px ${accent.replace(")", " / 0.35)")}`,
+  accentSoft: withAlpha(accent, 0.15),
+  glow: `0 0 32px ${withAlpha(accent, 0.35)}`,
 });
 
 export const SPACE_MODULES: SpaceModule[] = [
@@ -363,6 +368,23 @@ export const SPACE_MODULES: SpaceModule[] = [
     status: "active",
     size: "lg",
     theme: theme("oklch(0.70 0.13 45)"),
+  },
+  {
+    id: "cosmogenese",
+    codename: "GENESIS-118",
+    title: "Cosmogênese",
+    titleEn: "Cosmogenesis",
+    description:
+      "Tabela periódica cósmica — a arqueologia dos 118 elementos, do Big Bang à criação humana.",
+    descriptionEn:
+      "Cosmic periodic table — the archaeology of the 118 elements, from the Big Bang to human creation.",
+    href: "https://cosmogenese.vercel.app",
+    icon: Atom,
+    category: "science",
+    status: "active",
+    size: "lg",
+    theme: theme("oklch(0.76 0.15 175)"),
+    external: true,
   },
   {
     id: "solar-system",

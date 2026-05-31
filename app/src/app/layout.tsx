@@ -5,7 +5,7 @@ import "./globals.css";
 import { Header } from "@/src/components/Header";
 import { Footer } from "@/src/components/Footer";
 import { SystemStatusBar } from "@/src/components/SystemStatusBar";
-import Stars from "../components/Stars";
+import Stars from "@/src/components/Stars";
 import { Providers } from "@/src/components/Providers";
 import { SITE_URL } from "@/src/lib/config";
 
@@ -67,6 +67,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="dark">
       <body
+        suppressHydrationWarning
         className={`${inter.variable} ${cinzel.variable} ${mono.variable} font-sans antialiased min-h-screen flex flex-col bg-background text-foreground bg-vignette`}
       >
         <Providers>

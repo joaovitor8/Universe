@@ -2,7 +2,7 @@
 
 import type { ComponentType, SVGProps } from "react";
 import Link from "next/link";
-import { Orbit, Rocket, Sparkles } from "lucide-react";
+import { ArrowUpRight, Orbit, Rocket, Sparkles } from "lucide-react";
 
 import {
   CATEGORY_META,
@@ -51,11 +51,12 @@ export function Footer() {
   const year = new Date().getFullYear();
   const { t, locale } = useLocale();
 
-  // Conta total de rotas: módulos + corpos celestes + estáticas (mc, sobre, offline)
-  const totalRoutes = ENABLED_MODULES.length + SOLAR_BODIES.length + 3;
+  // Conta total de rotas internas: módulos não-externos + corpos celestes + estáticas (mc, sobre, offline)
+  const internalModulesCount = ENABLED_MODULES.filter((m) => !m.external).length;
+  const totalRoutes = internalModulesCount + SOLAR_BODIES.length + 3;
 
   return (
-    <footer className="relative mt-20 border-t border-white/[0.06] bg-background/95 backdrop-blur-md">
+    <footer className="relative mt-20 border-t border-white/6 bg-background/95 backdrop-blur-md">
       <div
         aria-hidden
         className="absolute inset-x-0 -top-px h-px"
@@ -108,17 +109,15 @@ export function Footer() {
 
               return (
                 <div key={catId} className="flex flex-col gap-2.5 min-w-0">
-                  <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-[0.25em] text-primary border-b border-white/[0.06] pb-1.5">
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-[0.25em] text-primary border-b border-white/6 pb-1.5">
                     <Icon className="w-3 h-3 shrink-0" />
                     <span className="truncate">{t(`category.${catId}`)}</span>
                   </div>
                   <ul className="flex flex-col gap-1.5">
-                    {modules.map((mod) => (
-                      <li key={mod.id}>
-                        <Link
-                          href={mod.href}
-                          className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 group"
-                        >
+                    {modules.map((mod) => {
+                      const linkClass = "text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 group";
+                      const inner = (
+                        <>
                           <span
                             className="w-1 h-1 rounded-full opacity-50 group-hover:opacity-100 transition-opacity shrink-0"
                             style={{
@@ -127,9 +126,23 @@ export function Footer() {
                             }}
                           />
                           <span className="truncate">{pickLocale(mod.title, mod.titleEn, locale)}</span>
-                        </Link>
-                      </li>
-                    ))}
+                          {mod.external && <ArrowUpRight className="w-2.5 h-2.5 opacity-50 shrink-0" />}
+                        </>
+                      );
+                      return (
+                        <li key={mod.id}>
+                          {mod.external ? (
+                            <a href={mod.href} target="_blank" rel="noreferrer" className={linkClass}>
+                              {inner}
+                            </a>
+                          ) : (
+                            <Link href={mod.href} className={linkClass}>
+                              {inner}
+                            </Link>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               );
@@ -169,7 +182,7 @@ export function Footer() {
         </div>
 
         {/* Mid: Data Sources + Tech Stack chips */}
-        <div className="mt-12 pt-8 border-t border-white/[0.06] grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="mt-12 pt-8 border-t border-white/6 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <h3 className="text-[10px] font-mono uppercase tracking-[0.3em] text-muted-foreground/70 mb-3">
               {t("footer.dataSources")}
@@ -178,7 +191,7 @@ export function Footer() {
               {DATA_SOURCES.map((src) => (
                 <span
                   key={src}
-                  className="text-[10px] font-mono uppercase tracking-[0.2em] px-2 py-1 rounded-md border border-white/[0.06] bg-white/[0.02] text-muted-foreground"
+                  className="text-[10px] font-mono uppercase tracking-[0.2em] px-2 py-1 rounded-md border border-white/6 bg-white/2 text-muted-foreground"
                 >
                   {src}
                 </span>
@@ -194,7 +207,7 @@ export function Footer() {
               {TECH_STACK.map((tech) => (
                 <span
                   key={tech}
-                  className="text-[10px] font-mono uppercase tracking-[0.2em] px-2 py-1 rounded-md border bg-primary/[0.04] text-primary/80"
+                  className="text-[10px] font-mono uppercase tracking-[0.2em] px-2 py-1 rounded-md border bg-primary/4 text-primary/80"
                   style={{ borderColor: "color-mix(in oklch, oklch(0.60 0.18 290) 25%, transparent)" }}
                 >
                   {tech}
@@ -205,7 +218,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-10 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground/70">
+        <div className="mt-10 pt-6 border-t border-white/6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground/70">
           <div className="flex items-center gap-2 flex-wrap">
             <Rocket className="w-3.5 h-3.5 text-muted-foreground/50" />
             <span>Universo Project</span>
@@ -295,7 +308,7 @@ const STAT_COLOR: Record<StatProps["accent"], string> = {
 
 function Stat({ label, value, accent }: StatProps) {
   return (
-    <div className="bg-white/[0.02] border border-white/[0.06] rounded-md p-2 flex flex-col gap-0.5">
+    <div className="bg-white/2 border border-white/6 rounded-md p-2 flex flex-col gap-0.5">
       <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-muted-foreground/70 truncate">
         {label}
       </span>

@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  createElement,
   useCallback,
   useContext,
   useEffect,
@@ -9,7 +10,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { createElement } from "react";
 
 /* ─── Tipagem ─────────────────────────────────────────────────── */
 

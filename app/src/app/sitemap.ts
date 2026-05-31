@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.7,
   }));
 
-  const moduleRoutes = ENABLED_MODULES.map((m) => ({
+  const moduleRoutes = ENABLED_MODULES.filter((m) => !m.external).map((m) => ({
     url: `${SITE_URL}${m.href}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

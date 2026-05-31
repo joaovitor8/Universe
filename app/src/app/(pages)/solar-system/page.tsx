@@ -9,6 +9,7 @@ import { getModule } from "@/src/lib/modules";
 import { pickLocale, useLocale } from "@/src/lib/i18n";
 import { ModuleScope } from "@/src/components/hud";
 import { BODY_TYPE_LABEL, SOLAR_BODIES, type SolarBody } from "@/src/lib/solar-system";
+import { withAlpha } from "@/src/lib/utils";
 
 const MODULE = getModule("solar-system")!;
 
@@ -247,7 +248,7 @@ export default function SolarSystemPage() {
                 >
                   <Link
                     href={`/solar-system/${body.id}`}
-                    className="group flex flex-col gap-2 p-4 rounded-xl border bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+                    className="group flex flex-col gap-2 p-4 rounded-xl border bg-white/2 hover:bg-white/4 transition-all"
                     style={{ borderColor: "rgba(255,255,255,0.06)" }}
                   >
                     <div className="flex items-center gap-3">
@@ -255,11 +256,11 @@ export default function SolarSystemPage() {
                         className="w-8 h-8 rounded-full shrink-0"
                         style={{
                           background: body.accent,
-                          boxShadow: `0 0 16px ${body.accent.replace(")", " / 0.5)")}`,
+                          boxShadow: `0 0 16px ${withAlpha(body.accent, 0.5)}`,
                         }}
                       />
                       <div className="min-w-0">
-                        <h3 className="font-serif text-base font-bold leading-tight truncate group-hover:text-[color:var(--accent)] transition-colors" style={{ color: body.accent }}>
+                        <h3 className="font-serif text-base font-bold leading-tight truncate group-hover:text-accent transition-colors" style={{ color: body.accent }}>
                           {locale === "en" ? body.en : body.pt}
                         </h3>
                         <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-muted-foreground/70">

@@ -14,7 +14,8 @@ interface Star {
   size: number;
   alpha: number;
   targetAlpha: number;
-  color: string;
+  /** Componentes RGB pré-computados (ex: "30, 144, 255"). */
+  rgb: string;
   /** Offset de pulsação para dessincronizar partículas. */
   phase: number;
 }
@@ -28,6 +29,8 @@ const hexToRgb = (hex: string): string => {
   const n = parseInt(hex.slice(1), 16);
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
 };
+
+const RGB_PALETTE = COLORS.map(hexToRgb);
 
 export default function Stars({ className = "", quantity = 30 }: StarsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,7 +54,7 @@ export default function Stars({ className = "", quantity = 30 }: StarsProps) {
       size: Math.random() * 1.9 + 0.1,
       alpha: 0,
       targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(2)),
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rgb: RGB_PALETTE[Math.floor(Math.random() * RGB_PALETTE.length)],
       phase: Math.random() * Math.PI * 2,
     });
 
@@ -83,7 +86,7 @@ export default function Stars({ className = "", quantity = 30 }: StarsProps) {
 
         ctx.beginPath();
         ctx.arc(star.x, star.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${hexToRgb(star.color)}, ${opacity})`;
+        ctx.fillStyle = `rgba(${star.rgb}, ${opacity})`;
         ctx.fill();
       }
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Orbit, Menu, X, Radar, Sparkles } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Orbit, Menu, X, Radar, Sparkles } from "lucide-react";
 
 import {
   CATEGORY_META,
@@ -13,6 +13,7 @@ import {
 } from "@/src/lib/modules";
 import { SOLAR_BODIES } from "@/src/lib/solar-system";
 import { pickLocale, useLocale } from "@/src/lib/i18n";
+import { withAlpha } from "@/src/lib/utils";
 
 const CATEGORY_ORDER: ModuleCategory[] = [
   "media",
@@ -37,7 +38,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-6 inset-x-0 z-50 h-16 border-b border-white/[0.06] bg-background/70 backdrop-blur-2xl">
+      <header className="fixed top-6 inset-x-0 z-50 h-16 border-b border-white/6 bg-background/70 backdrop-blur-2xl">
         <div className="container mx-auto px-4 h-full flex items-center justify-between">
           {/* Logo */}
           <Link
@@ -89,7 +90,7 @@ export function Header() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.97 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute top-14 left-1/2 -translate-x-1/2 w-[64rem] rounded-2xl shadow-2xl overflow-hidden border border-white/[0.08] bg-[#06060c]/95 backdrop-blur-2xl"
+                    className="absolute top-14 left-1/2 -translate-x-1/2 w-5xl rounded-2xl shadow-2xl overflow-hidden border border-white/8 bg-[#06060c]/95 backdrop-blur-2xl"
                   >
                     {/* Brackets */}
                     <span className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-primary/60" />
@@ -106,39 +107,28 @@ export function Header() {
 
                         return (
                           <div key={catId} className="flex flex-col gap-3">
-                            <div className="flex items-center gap-2 text-primary text-[10px] font-mono uppercase tracking-[0.25em] border-b border-white/[0.08] pb-2 mb-1">
+                            <div className="flex items-center gap-2 text-primary text-[10px] font-mono uppercase tracking-[0.25em] border-b border-white/8 pb-2 mb-1">
                               <Icon className="w-3.5 h-3.5" /> {t(`category.${catId}`)}
                             </div>
                             {modules.map((mod) => {
                               const isActive = mod.status === "active";
-                              const isCurrent = isCurrentRoute(mod.href);
+                              const isCurrent = !mod.external && isCurrentRoute(mod.href);
                               const title = pickLocale(mod.title, mod.titleEn, locale);
-                              return (
-                                <Link
-                                  key={mod.id}
-                                  href={isActive ? mod.href : "#"}
-                                  onClick={(e) => {
-                                    if (!isActive) e.preventDefault();
-                                    setMegaOpen(false);
-                                  }}
-                                  className={`group flex items-center justify-between gap-2 text-sm transition-all rounded-md -mx-1 px-1 py-0.5 ${
-                                    isCurrent
-                                      ? "font-bold"
-                                      : isActive
-                                      ? "text-muted-foreground hover:text-foreground"
-                                      : "text-muted-foreground/30 cursor-not-allowed"
-                                  }`}
-                                  style={
-                                    isCurrent
-                                      ? {
-                                          color: mod.theme.accent,
-                                          background: mod.theme.accentSoft,
-                                        }
-                                      : undefined
+                              const className = `group flex items-center justify-between gap-2 text-sm transition-all rounded-md -mx-1 px-1 py-0.5 ${
+                                isCurrent
+                                  ? "font-bold"
+                                  : isActive
+                                  ? "text-muted-foreground hover:text-foreground"
+                                  : "text-muted-foreground/30 cursor-not-allowed"
+                              }`;
+                              const style = isCurrent
+                                ? {
+                                    color: mod.theme.accent,
+                                    background: mod.theme.accentSoft,
                                   }
-                                  aria-disabled={!isActive}
-                                  aria-current={isCurrent ? "page" : undefined}
-                                >
+                                : undefined;
+                              const content = (
+                                <>
                                   <span className="flex items-center gap-2">
                                     {isActive && !isCurrent && (
                                       <span
@@ -165,10 +155,44 @@ export function Header() {
                                       {t("nav.soon")}
                                     </span>
                                   ) : (
-                                    <span className="text-[9px] font-mono opacity-40 group-hover:opacity-80 transition-opacity">
+                                    <span className="flex items-center gap-1 text-[9px] font-mono opacity-40 group-hover:opacity-80 transition-opacity">
                                       {mod.codename}
+                                      {mod.external && <ArrowUpRight className="w-2.5 h-2.5" />}
                                     </span>
                                   )}
+                                </>
+                              );
+
+                              if (isActive && mod.external) {
+                                return (
+                                  <a
+                                    key={mod.id}
+                                    href={mod.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={() => setMegaOpen(false)}
+                                    className={className}
+                                    style={style}
+                                  >
+                                    {content}
+                                  </a>
+                                );
+                              }
+
+                              return (
+                                <Link
+                                  key={mod.id}
+                                  href={isActive ? mod.href : "#"}
+                                  onClick={(e) => {
+                                    if (!isActive) e.preventDefault();
+                                    setMegaOpen(false);
+                                  }}
+                                  className={className}
+                                  style={style}
+                                  aria-disabled={!isActive}
+                                  aria-current={isCurrent ? "page" : undefined}
+                                >
+                                  {content}
                                 </Link>
                               );
                             })}
@@ -178,7 +202,7 @@ export function Header() {
                     </div>
 
                     {/* Bottom: faixa de Sistema Solar + Subsystems */}
-                    <div className="border-t border-white/[0.06] bg-white/[0.015] px-7 py-4 grid grid-cols-12 gap-6">
+                    <div className="border-t border-white/6 bg-white/1.5 px-7 py-4 grid grid-cols-12 gap-6">
                       <div className="col-span-9">
                         <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.25em] mb-2.5" style={{ color: "oklch(0.78 0.16 80)" }}>
                           <Sparkles className="w-3 h-3" /> {t("nav.bodies")}
@@ -208,7 +232,7 @@ export function Header() {
                                   className="w-1.5 h-1.5 rounded-full shrink-0"
                                   style={{
                                     background: body.accent,
-                                    boxShadow: `0 0 6px ${body.accent.replace(")", " / 0.6)")}`,
+                                    boxShadow: `0 0 6px ${withAlpha(body.accent, 0.6)}`,
                                   }}
                                 />
                                 {locale === "en" ? body.en : body.pt}
@@ -218,7 +242,7 @@ export function Header() {
                         </div>
                       </div>
 
-                      <div className="col-span-3 flex flex-col gap-2 border-l border-white/[0.06] pl-6">
+                      <div className="col-span-3 flex flex-col gap-2 border-l border-white/6 pl-6">
                         <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-1">
                           {t("nav.subsystems")}
                         </div>
@@ -291,8 +315,42 @@ export function Header() {
                     <div className="flex flex-col gap-3 pl-2">
                       {modules.map((mod) => {
                         const isActive = mod.status === "active";
-                        const isCurrent = isCurrentRoute(mod.href);
+                        const isCurrent = !mod.external && isCurrentRoute(mod.href);
                         const title = pickLocale(mod.title, mod.titleEn, locale);
+                        const className = "flex items-center justify-between text-base transition-colors";
+                        const style = isCurrent
+                          ? { color: mod.theme.accent, fontWeight: 700 }
+                          : undefined;
+                        const content = (
+                          <>
+                            <span className={`flex items-center gap-1.5 ${isCurrent ? "" : isActive ? "text-muted-foreground" : "text-muted-foreground/30"}`}>
+                              {title}
+                              {isActive && mod.external && <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />}
+                            </span>
+                            {!isActive && (
+                              <span className="text-[9px] font-mono tracking-widest uppercase border border-muted-foreground/20 rounded px-1.5 py-0.5">
+                                {t("nav.soon")}
+                              </span>
+                            )}
+                          </>
+                        );
+
+                        if (isActive && mod.external) {
+                          return (
+                            <a
+                              key={mod.id}
+                              href={mod.href}
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => setMobileOpen(false)}
+                              className={className}
+                              style={style}
+                            >
+                              {content}
+                            </a>
+                          );
+                        }
+
                         return (
                           <Link
                             key={mod.id}
@@ -301,21 +359,10 @@ export function Header() {
                               if (!isActive) e.preventDefault();
                               setMobileOpen(false);
                             }}
-                            className="flex items-center justify-between text-base transition-colors"
-                            style={
-                              isCurrent
-                                ? { color: mod.theme.accent, fontWeight: 700 }
-                                : undefined
-                            }
+                            className={className}
+                            style={style}
                           >
-                            <span className={isCurrent ? "" : isActive ? "text-muted-foreground" : "text-muted-foreground/30"}>
-                              {title}
-                            </span>
-                            {!isActive && (
-                              <span className="text-[9px] font-mono tracking-widest uppercase border border-muted-foreground/20 rounded px-1.5 py-0.5">
-                                {t("nav.soon")}
-                              </span>
-                            )}
+                            {content}
                           </Link>
                         );
                       })}
