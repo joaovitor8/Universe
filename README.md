@@ -31,42 +31,6 @@ Universo é uma plataforma imersiva que reúne em uma única interface os princi
 | Ícones / Tipografia  | Lucide, Inter, Cinzel, JetBrains Mono                   |
 | PWA                  | Service Worker custom, Web App Manifest                 |
 
-## Quickstart
-
-```bash
-# Pré-requisitos: Node.js 20+ e npm
-git clone https://github.com/seu-usuario/Universe.git
-cd Universe/app
-
-# Variáveis de ambiente (.env.local)
-cp .env.example .env.local   # ou crie manualmente — ver seção abaixo
-
-npm install
-npm run dev                  # http://localhost:3000
-```
-
-### Variáveis de ambiente
-
-```env
-# Obrigatória — chave da NASA Open APIs (free em api.nasa.gov)
-KEY_NASA=sua_chave_aqui
-
-# Opcional — usada em sitemap, robots, OG metadata
-NEXT_PUBLIC_SITE_URL=https://seu-dominio.com
-
-# Opcional — origens permitidas em dev (LAN, ngrok)
-DEV_ALLOWED_ORIGINS=192.168.1.8,192.168.1.10
-```
-
-### Scripts
-
-```bash
-npm run dev      # Dev server com Turbopack
-npm run build    # Build de produção
-npm run start    # Servir build de produção
-npm run lint     # ESLint estrito (--max-warnings 0)
-```
-
 ## Arquitetura
 
 ```
